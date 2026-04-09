@@ -69,29 +69,29 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| INPT-01 | — | Pending |
-| INPT-02 | — | Pending |
-| INPT-03 | — | Pending |
-| INPT-04 | — | Pending |
-| INPT-05 | — | Pending |
-| EXTR-01 | — | Pending |
-| EXTR-02 | — | Pending |
-| EXTR-03 | — | Pending |
-| EXTR-04 | — | Pending |
-| OUTP-01 | — | Pending |
-| OUTP-02 | — | Pending |
-| OUTP-03 | — | Pending |
-| OUTP-04 | — | Pending |
-| OUTP-05 | — | Pending |
-| OUTP-06 | — | Pending |
-| INFR-01 | — | Pending |
-| INFR-02 | — | Pending |
+| INPT-01 | Phase 1 | Pending |
+| INPT-02 | Phase 1 | Pending |
+| INPT-03 | Phase 1 | Pending |
+| INPT-04 | Phase 3 | Pending |
+| INPT-05 | Phase 1 | Pending |
+| EXTR-01 | Phase 1 | Pending |
+| EXTR-02 | Phase 1 | Pending |
+| EXTR-03 | Phase 1 | Pending |
+| EXTR-04 | Phase 1 | Pending |
+| OUTP-01 | Phase 2 | Pending |
+| OUTP-02 | Phase 2 | Pending |
+| OUTP-03 | Phase 2 | Pending |
+| OUTP-04 | Phase 2 | Pending |
+| OUTP-05 | Phase 2 | Pending |
+| OUTP-06 | Phase 2 | Pending |
+| INFR-01 | Phase 1 | Pending |
+| INFR-02 | Phase 1 | Pending |
 
 **Coverage:**
 - v1 requirements: 17 total
-- Mapped to phases: 0
-- Unmapped: 17 ⚠️
+- Mapped to phases: 17
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-04-14*
-*Last updated: 2026-04-14 after initial definition*
+*Last updated: 2026-04-14 after roadmap creation*
