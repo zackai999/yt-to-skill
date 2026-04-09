@@ -28,7 +28,14 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. User can re-run the pipeline on the same video and have all completed stages skipped, with outputs served from disk artifacts in `work/<video_id>/`
   4. The pipeline produces `extracted_logic.json` containing entry/exit criteria, indicators, timeframes, risk rules, and market conditions — with `REQUIRES_SPECIFICATION` markers on any unstated parameters
   5. Non-strategy videos (vlogs, news, clickbait) are detected and skipped before LLM extraction calls are made
-**Plans**: TBD
+**Plans:** 5 plans
+
+Plans:
+- [ ] 01-01-PLAN.md — Project scaffold, config, data models, and test infrastructure
+- [ ] 01-02-PLAN.md — OpenRouter LLM client wrapper, prompt templates, and trading glossary
+- [ ] 01-03-PLAN.md — Ingest and Transcript stages (captions + Whisper fallback)
+- [ ] 01-04-PLAN.md — Filter and Translation stages
+- [ ] 01-05-PLAN.md — Extraction stage and Orchestrator wiring
 
 ### Phase 2: Output and CLI
 **Goal**: Users can invoke `yt-to-skill <url>` and receive an installable `skills/<video_id>/SKILL.md` complying with the Agent Skills specification
@@ -57,6 +64,6 @@ Phases execute in numeric order: 1 → 2 → 3
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Text Pipeline | 0/TBD | Not started | - |
+| 1. Text Pipeline | 0/5 | Planning complete | - |
 | 2. Output and CLI | 0/TBD | Not started | - |
 | 3. Visual Enrichment | 0/TBD | Not started | - |
