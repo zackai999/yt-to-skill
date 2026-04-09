@@ -1,0 +1,10 @@
+work/
+.env
+__pycache__/
+*.pyc
+.mypy_cache/
+.ruff_cache/
+dist/
+*.egg-info/
+.venv/
+.python-version
