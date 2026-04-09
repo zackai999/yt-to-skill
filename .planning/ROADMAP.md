@@ -28,7 +28,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. User can re-run the pipeline on the same video and have all completed stages skipped, with outputs served from disk artifacts in `work/<video_id>/`
   4. The pipeline produces `extracted_logic.json` containing entry/exit criteria, indicators, timeframes, risk rules, and market conditions — with `REQUIRES_SPECIFICATION` markers on any unstated parameters
   5. Non-strategy videos (vlogs, news, clickbait) are detected and skipped before LLM extraction calls are made
-**Plans:** 5 plans
+**Plans:** 1/5 plans executed
 
 Plans:
 - [ ] 01-01-PLAN.md — Project scaffold, config, data models, and test infrastructure
@@ -64,6 +64,6 @@ Phases execute in numeric order: 1 → 2 → 3
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Text Pipeline | 0/5 | Planning complete | - |
+| 1. Text Pipeline | 1/5 | In Progress|  |
 | 2. Output and CLI | 0/TBD | Not started | - |
 | 3. Visual Enrichment | 0/TBD | Not started | - |

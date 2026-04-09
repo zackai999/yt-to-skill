@@ -18,8 +18,8 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Translation & Extraction
 
 - [ ] **EXTR-01**: User can translate Chinese transcripts to English via OpenRouter LLM with trading terminology glossary
-- [ ] **EXTR-02**: User can extract structured trading logic (entry/exit criteria, indicators, timeframes, risk rules, market conditions) from translated transcripts
-- [ ] **EXTR-03**: Extracted strategies flag implicit/unstated parameters with REQUIRES_SPECIFICATION markers
+- [x] **EXTR-02**: User can extract structured trading logic (entry/exit criteria, indicators, timeframes, risk rules, market conditions) from translated transcripts
+- [x] **EXTR-03**: Extracted strategies flag implicit/unstated parameters with REQUIRES_SPECIFICATION markers
 - [ ] **EXTR-04**: Pipeline filters out non-strategy content (vlogs, news, clickbait) before full extraction
 
 ### Output & CLI
@@ -34,7 +34,7 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Infrastructure
 
 - [ ] **INFR-01**: All LLM calls route through OpenRouter as unified gateway
-- [ ] **INFR-02**: Pipeline uses intermediate artifacts on disk (work/<video_id>/) for resumability and debugging
+- [x] **INFR-02**: Pipeline uses intermediate artifacts on disk (work/<video_id>/) for resumability and debugging
 
 ## v2 Requirements
 
@@ -75,8 +75,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | INPT-04 | Phase 3 | Pending |
 | INPT-05 | Phase 1 | Pending |
 | EXTR-01 | Phase 1 | Pending |
-| EXTR-02 | Phase 1 | Pending |
-| EXTR-03 | Phase 1 | Pending |
+| EXTR-02 | Phase 1 | Complete |
+| EXTR-03 | Phase 1 | Complete |
 | EXTR-04 | Phase 1 | Pending |
 | OUTP-01 | Phase 2 | Pending |
 | OUTP-02 | Phase 2 | Pending |
@@ -85,7 +85,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | OUTP-05 | Phase 2 | Pending |
 | OUTP-06 | Phase 2 | Pending |
 | INFR-01 | Phase 1 | Pending |
-| INFR-02 | Phase 1 | Pending |
+| INFR-02 | Phase 1 | Complete |
 
 **Coverage:**
 - v1 requirements: 17 total
