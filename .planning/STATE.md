@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: planning
-stopped_at: Completed 01-text-pipeline-03-PLAN.md
-last_updated: "2026-04-13T20:22:19.327Z"
+stopped_at: Completed 01-text-pipeline-04-PLAN.md
+last_updated: "2026-04-13T20:28:44.129Z"
 last_activity: 2026-04-14 — Roadmap created
 progress:
   total_phases: 3
   completed_phases: 0
   total_plans: 5
-  completed_plans: 3
+  completed_plans: 4
   percent: 0
 ---
 
@@ -53,6 +53,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 01-text-pipeline P01 | 20min | 2 tasks | 15 files |
 | Phase 01-text-pipeline P02 | 3min | 2 tasks | 6 files |
 | Phase 01-text-pipeline P03 | 10min | 2 tasks | 4 files |
+| Phase 01-text-pipeline P04 | 8min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -73,6 +74,8 @@ Recent decisions affecting current work:
 - [Phase 01-text-pipeline]: Trading glossary blocker resolved: 97-term Chinese-English glossary now available before first extraction run
 - [Phase 01-text-pipeline]: youtube-transcript-api v1.2+ uses instance-based API: YouTubeTranscriptApi().list(video_id)
 - [Phase 01-text-pipeline]: Chinese short segment detection: <3 words AND <5 chars to handle CJK text without spaces
+- [Phase 01-text-pipeline]: Any type hint for llm_client in stages: static analysis test bans openai imports in stages/ — using Any satisfies enforcement while preserving intent
+- [Phase 01-text-pipeline]: Two-stage filter pattern: free metadata scoring gates expensive LLM classify_content call — Stage 1 rejects obvious non-strategy, Stage 2 confirms borderline cases
 
 ### Pending Todos
 
@@ -86,6 +89,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-13T20:22:19.326Z
-Stopped at: Completed 01-text-pipeline-03-PLAN.md
+Last session: 2026-04-13T20:28:44.127Z
+Stopped at: Completed 01-text-pipeline-04-PLAN.md
 Resume file: None
