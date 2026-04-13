@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: planning
-stopped_at: Completed 01-text-pipeline-02-PLAN.md
-last_updated: "2026-04-13T20:15:18.363Z"
+stopped_at: Completed 01-text-pipeline-03-PLAN.md
+last_updated: "2026-04-13T20:22:19.327Z"
 last_activity: 2026-04-14 — Roadmap created
 progress:
   total_phases: 3
   completed_phases: 0
   total_plans: 5
-  completed_plans: 2
+  completed_plans: 3
   percent: 0
 ---
 
@@ -52,6 +52,7 @@ Progress: [░░░░░░░░░░] 0%
 *Updated after each plan completion*
 | Phase 01-text-pipeline P01 | 20min | 2 tasks | 15 files |
 | Phase 01-text-pipeline P02 | 3min | 2 tasks | 6 files |
+| Phase 01-text-pipeline P03 | 10min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -70,6 +71,8 @@ Recent decisions affecting current work:
 - [Phase 01-text-pipeline]: All LLM calls route through yt_to_skill/llm/client.py — enforced by static analysis test scanning stages/ for direct openai imports
 - [Phase 01-text-pipeline]: Prompt templates stored as .txt files alongside client.py — loaded at call time, not at import time
 - [Phase 01-text-pipeline]: Trading glossary blocker resolved: 97-term Chinese-English glossary now available before first extraction run
+- [Phase 01-text-pipeline]: youtube-transcript-api v1.2+ uses instance-based API: YouTubeTranscriptApi().list(video_id)
+- [Phase 01-text-pipeline]: Chinese short segment detection: <3 words AND <5 chars to handle CJK text without spaces
 
 ### Pending Todos
 
@@ -83,6 +86,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-13T20:15:18.361Z
-Stopped at: Completed 01-text-pipeline-02-PLAN.md
+Last session: 2026-04-13T20:22:19.326Z
+Stopped at: Completed 01-text-pipeline-03-PLAN.md
 Resume file: None
