@@ -33,7 +33,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Infrastructure
 
-- [ ] **INFR-01**: All LLM calls route through OpenRouter as unified gateway
+- [x] **INFR-01**: All LLM calls route through OpenRouter as unified gateway
 - [x] **INFR-02**: Pipeline uses intermediate artifacts on disk (work/<video_id>/) for resumability and debugging
 
 ## v2 Requirements
@@ -84,7 +84,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | OUTP-04 | Phase 2 | Pending |
 | OUTP-05 | Phase 2 | Pending |
 | OUTP-06 | Phase 2 | Pending |
-| INFR-01 | Phase 1 | Pending |
+| INFR-01 | Phase 1 | Complete |
 | INFR-02 | Phase 1 | Complete |
 
 **Coverage:**
