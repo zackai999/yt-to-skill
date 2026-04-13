@@ -46,7 +46,7 @@ Plans:
   2. User can run `yt-to-skill <playlist-or-channel-url>` and have all videos processed in batch; a single failed video does not abort the run
   3. Generated SKILL.md includes `assets/`, `scripts/`, and `references/` directory scaffold regardless of keyframe content
   4. Error messages distinguish network failures, extraction failures, LLM failures, and format failures with actionable descriptions
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 
 Plans:
 - [ ] 02-01-PLAN.md — Typed error hierarchy and SKILL.md generation stage
@@ -69,5 +69,5 @@ Phases execute in numeric order: 1 → 2 → 3
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Text Pipeline | 4/5 | In Progress|  |
-| 2. Output and CLI | 0/2 | Not started | - |
+| 2. Output and CLI | 1/2 | In Progress|  |
 | 3. Visual Enrichment | 0/TBD | Not started | - |

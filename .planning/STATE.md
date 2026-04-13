@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: planning
-stopped_at: Phase 2 context gathered
-last_updated: "2026-04-13T21:35:34.822Z"
-last_activity: 2026-04-14 — Roadmap created
+status: executing
+stopped_at: "Completed 02-output-and-cli/02-01-PLAN.md"
+last_updated: "2026-04-13T23:10:28Z"
+last_activity: 2026-04-14 — Completed plan 02-01 (errors + skill stage)
 progress:
   total_phases: 3
   completed_phases: 1
-  total_plans: 5
-  completed_plans: 5
-  percent: 0
+  total_plans: 6
+  completed_plans: 6
+  percent: 40
 ---
 
 # Project State
@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 
 ## Current Position
 
-Phase: 1 of 3 (Text Pipeline)
-Plan: 0 of TBD in current phase
-Status: Ready to plan
-Last activity: 2026-04-14 — Roadmap created
+Phase: 2 of 3 (Output and CLI)
+Plan: 1 of TBD in current phase
+Status: Executing
+Last activity: 2026-04-14 — Completed plan 02-01 (errors + skill stage)
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [████░░░░░░] 40%
 
 ## Performance Metrics
 
@@ -55,6 +55,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 01-text-pipeline P03 | 10min | 2 tasks | 4 files |
 | Phase 01-text-pipeline P04 | 8min | 2 tasks | 4 files |
 | Phase 01-text-pipeline P05 | 3min | 2 tasks | 4 files |
+| Phase 02-output-and-cli P01 | 2min | 1 task (TDD) | 4 files |
 
 ## Accumulated Context
 
@@ -79,6 +80,10 @@ Recent decisions affecting current work:
 - [Phase 01-text-pipeline]: Two-stage filter pattern: free metadata scoring gates expensive LLM classify_content call — Stage 1 rejects obvious non-strategy, Stage 2 confirms borderline cases
 - [Phase 01-text-pipeline]: Orchestrator reads FilterResult.from_json after filter stage to determine is_strategy — decouples orchestration from filter return values
 - [Phase 01-text-pipeline]: extract_video_id uses urllib.parse for YouTube URL parsing — robust handling of query params and path segments
+- [Phase 02-output-and-cli]: SkillError uses class-level category/suggestion attributes — subclasses need no __init__ override
+- [Phase 02-output-and-cli]: REQUIRES_SPECIFICATION markers placed inline within Entry/Exit Criteria section — not as a top-level section
+- [Phase 02-output-and-cli]: yaml.dump used for SKILL.md frontmatter serialization to guarantee valid YAML
+- [Phase 02-output-and-cli]: run_skill wraps FileNotFoundError and ValidationError as FormatError for unified caller interface
 
 ### Pending Todos
 
@@ -92,6 +97,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-13T21:35:34.819Z
-Stopped at: Phase 2 context gathered
-Resume file: .planning/phases/02-output-and-cli/02-CONTEXT.md
+Last session: 2026-04-13T23:10:28Z
+Stopped at: Completed 02-output-and-cli/02-01-PLAN.md
+Resume file: .planning/phases/02-output-and-cli/02-01-SUMMARY.md

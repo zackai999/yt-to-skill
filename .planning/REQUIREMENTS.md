@@ -24,12 +24,12 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Output & CLI
 
-- [ ] **OUTP-01**: Pipeline generates SKILL.md following Agent Skills spec (YAML frontmatter + structured Markdown body)
-- [ ] **OUTP-02**: Skill output includes directory structure with assets/ (keyframes), scripts/, references/
-- [ ] **OUTP-03**: Generated skills use three-level structure: strategy overview, entry/exit criteria, risk management, market regime filters
+- [x] **OUTP-01**: Pipeline generates SKILL.md following Agent Skills spec (YAML frontmatter + structured Markdown body)
+- [x] **OUTP-02**: Skill output includes directory structure with assets/ (keyframes), scripts/, references/
+- [x] **OUTP-03**: Generated skills use three-level structure: strategy overview, entry/exit criteria, risk management, market regime filters
 - [ ] **OUTP-04**: User can run pipeline via CLI with single video URL, playlist URL, or channel URL
 - [ ] **OUTP-05**: Pipeline processes channels/playlists in batch with per-video error isolation
-- [ ] **OUTP-06**: Pipeline reports clear error messages distinguishing network, extraction, LLM, and format failures
+- [x] **OUTP-06**: Pipeline reports clear error messages distinguishing network, extraction, LLM, and format failures
 
 ### Infrastructure
 
@@ -78,12 +78,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | EXTR-02 | Phase 1 | Complete |
 | EXTR-03 | Phase 1 | Complete |
 | EXTR-04 | Phase 1 | Complete |
-| OUTP-01 | Phase 2 | Pending |
-| OUTP-02 | Phase 2 | Pending |
-| OUTP-03 | Phase 2 | Pending |
+| OUTP-01 | Phase 2 | Complete |
+| OUTP-02 | Phase 2 | Complete |
+| OUTP-03 | Phase 2 | Complete |
 | OUTP-04 | Phase 2 | Pending |
 | OUTP-05 | Phase 2 | Pending |
-| OUTP-06 | Phase 2 | Pending |
+| OUTP-06 | Phase 2 | Complete |
 | INFR-01 | Phase 1 | Complete |
 | INFR-02 | Phase 1 | Complete |
 
