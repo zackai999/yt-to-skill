@@ -8,11 +8,10 @@ Both stages must pass for a video to proceed to extraction.
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
+from typing import Any
 
 from loguru import logger
-from openai import OpenAI
 
 from yt_to_skill.config import PipelineConfig
 from yt_to_skill.llm.client import classify_content
@@ -84,7 +83,7 @@ def run_filter(
     video_id: str,
     work_dir: Path,
     config: PipelineConfig,
-    llm_client: OpenAI | None = None,
+    llm_client: Any | None = None,
 ) -> StageResult:
     """Run the two-stage non-strategy content filter.
 

@@ -11,11 +11,11 @@ the translated output before writing to disk.
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Any
 
 import langdetect
 from langdetect import LangDetectException
 from loguru import logger
-from openai import OpenAI
 
 from yt_to_skill.config import PipelineConfig
 from yt_to_skill.llm.client import load_glossary, translate_text
@@ -118,7 +118,7 @@ def run_translate(
     video_id: str,
     work_dir: Path,
     config: PipelineConfig,
-    llm_client: OpenAI | None = None,
+    llm_client: Any | None = None,
 ) -> StageResult:
     """Detect source language and translate transcript to English if needed.
 
