@@ -21,6 +21,7 @@ from yt_to_skill.stages.base import StageResult
 from yt_to_skill.stages.extract import run_extract
 from yt_to_skill.stages.filter import run_filter
 from yt_to_skill.stages.ingest import run_ingest
+from yt_to_skill.stages.skill import run_skill
 from yt_to_skill.stages.transcript import run_transcript
 from yt_to_skill.stages.translate import run_translate
 
@@ -77,13 +78,15 @@ def extract_video_id(url: str) -> str:
 # ---------------------------------------------------------------------------
 
 
-def run_pipeline(video_id: str, config: PipelineConfig) -> list[StageResult]:
-    """Run all pipeline stages in sequence: ingest -> transcript -> filter -> translate -> extract.
+def run_pipeline(
+    video_id: str, config: PipelineConfig, *, force: bool = False
+) -> list[StageResult]:
+    """Run all pipeline stages in sequence: ingest -> transcript -> filter -> translate -> extract -> skill.
 
     Creates work/<video_id>/ directory.  Creates LLM clients once and passes to
     all stages that need them.
 
-    Skips translate+extract when filter marks video as non-strategy.
+    Skips translate+extract+skill when filter marks video as non-strategy.
     Wraps each stage in try/except — on error, appends a StageResult with the
     error field set and continues (downstream stages that depend on failed stage
     artifacts may also fail or skip naturally).
@@ -91,6 +94,7 @@ def run_pipeline(video_id: str, config: PipelineConfig) -> list[StageResult]:
     Args:
         video_id: YouTube video ID.
         config: Pipeline configuration.
+        force: When True, regenerate existing artifacts.
 
     Returns:
         List of StageResults (one per stage attempted).
@@ -231,6 +235,29 @@ def run_pipeline(video_id: str, config: PipelineConfig) -> list[StageResult]:
             StageResult(
                 stage_name="extract",
                 artifact_path=video_dir / "extracted_logic.json",
+                skipped=False,
+                error=str(exc),
+            )
+        )
+
+    # -----------------------------------------------------------------------
+    # Stage 6: Skill generation
+    # -----------------------------------------------------------------------
+    try:
+        skill_result = run_skill(video_id, work_dir, config.skills_dir, force=force)
+        results.append(skill_result)
+        status = "skipped" if skill_result.skipped else "completed"
+        logger.info("Stage: skill — {}", status)
+    except Exception as exc:  # noqa: BLE001
+        logger.error(
+            "Stage: skill — ERROR | video_id={} | error={}",
+            video_id,
+            exc,
+        )
+        results.append(
+            StageResult(
+                stage_name="skill",
+                artifact_path=config.skills_dir / video_id / "SKILL.md",
                 skipped=False,
                 error=str(exc),
             )

@@ -16,6 +16,9 @@ dependencies = [
     "langdetect>=1.0.9",
 ]
 
+[project.scripts]
+yt-to-skill = "yt_to_skill.cli:main"
+
 [project.optional-dependencies]
 dev = [
     "pytest>=8.2.0",

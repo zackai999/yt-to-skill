@@ -13,6 +13,7 @@ class PipelineConfig(BaseSettings):
 
     openrouter_api_key: str
     work_dir: Path = Path("work")
+    skills_dir: Path = Path("skills")
     translation_model: str = "anthropic/claude-sonnet-4-20250514"
     extraction_model: str = "anthropic/claude-sonnet-4-20250514"
     filter_model: str = "mistralai/mistral-7b-instruct"

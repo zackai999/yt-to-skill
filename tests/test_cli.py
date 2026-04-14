@@ -141,6 +141,7 @@ def test_cli_single_video(monkeypatch, capsys):
     """main() with single video URL processes it and exits 0."""
     from yt_to_skill.cli import main
 
+    monkeypatch.setenv("OPENROUTER_API_KEY", "test-key")
     monkeypatch.setattr("sys.argv", ["yt-to-skill", "https://www.youtube.com/watch?v=vid1xxx"])
 
     with patch("yt_to_skill.cli.resolve_urls", return_value=["vid1xxx"]) as mock_resolve, \
@@ -157,6 +158,7 @@ def test_cli_output_dir_flag(monkeypatch, tmp_path):
     """--output-dir overrides the default skills/ path."""
     from yt_to_skill.cli import main
 
+    monkeypatch.setenv("OPENROUTER_API_KEY", "test-key")
     custom_dir = str(tmp_path / "custom_skills")
     monkeypatch.setattr("sys.argv", [
         "yt-to-skill", "https://www.youtube.com/watch?v=vid1xxx",
@@ -183,6 +185,7 @@ def test_cli_force_flag(monkeypatch):
     """--force passes force=True to run_pipeline."""
     from yt_to_skill.cli import main
 
+    monkeypatch.setenv("OPENROUTER_API_KEY", "test-key")
     monkeypatch.setattr("sys.argv", [
         "yt-to-skill", "https://www.youtube.com/watch?v=vid1xxx",
         "--force",
@@ -208,6 +211,7 @@ def test_cli_verbose_flag(monkeypatch, capsys):
     """--verbose sets loguru level to DEBUG (no crash)."""
     from yt_to_skill.cli import main
 
+    monkeypatch.setenv("OPENROUTER_API_KEY", "test-key")
     monkeypatch.setattr("sys.argv", [
         "yt-to-skill", "https://www.youtube.com/watch?v=vid1xxx",
         "--verbose",
@@ -226,6 +230,7 @@ def test_batch_continues_on_failure(monkeypatch, capsys):
     """When one video raises SkillError, the next video still processes."""
     from yt_to_skill.cli import main
 
+    monkeypatch.setenv("OPENROUTER_API_KEY", "test-key")
     monkeypatch.setattr("sys.argv", [
         "yt-to-skill", "https://www.youtube.com/playlist?list=PLxyz",
     ])
@@ -254,6 +259,7 @@ def test_exit_code_all_success(monkeypatch):
     """Exit code is 0 when all videos succeed."""
     from yt_to_skill.cli import main
 
+    monkeypatch.setenv("OPENROUTER_API_KEY", "test-key")
     monkeypatch.setattr("sys.argv", [
         "yt-to-skill", "https://www.youtube.com/watch?v=vid1xxx",
     ])
@@ -271,6 +277,7 @@ def test_exit_code_partial_failure(monkeypatch):
     """Exit code is 1 when any video fails."""
     from yt_to_skill.cli import main
 
+    monkeypatch.setenv("OPENROUTER_API_KEY", "test-key")
     monkeypatch.setattr("sys.argv", [
         "yt-to-skill", "https://www.youtube.com/playlist?list=PLx",
     ])
@@ -293,6 +300,7 @@ def test_batch_summary_table(monkeypatch, capsys):
     """Summary table is printed at end of batch with video status."""
     from yt_to_skill.cli import main
 
+    monkeypatch.setenv("OPENROUTER_API_KEY", "test-key")
     monkeypatch.setattr("sys.argv", [
         "yt-to-skill", "https://www.youtube.com/playlist?list=PLx",
     ])
@@ -320,6 +328,7 @@ def test_non_strategy_video_in_batch(monkeypatch, capsys):
     """Non-strategy video shows as skipped in summary, not as failure."""
     from yt_to_skill.cli import main
 
+    monkeypatch.setenv("OPENROUTER_API_KEY", "test-key")
     monkeypatch.setattr("sys.argv", [
         "yt-to-skill", "https://www.youtube.com/playlist?list=PLx",
     ])
@@ -351,6 +360,7 @@ def test_resolve_error_exits_1(monkeypatch, capsys):
     from yt_to_skill.cli import main
     from yt_to_skill.errors import NetworkError
 
+    monkeypatch.setenv("OPENROUTER_API_KEY", "test-key")
     monkeypatch.setattr("sys.argv", [
         "yt-to-skill", "https://not-youtube.com/video",
     ])

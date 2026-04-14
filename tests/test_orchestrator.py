@@ -61,6 +61,7 @@ def test_run_pipeline_creates_work_directory(config: PipelineConfig, video_id: s
          patch("yt_to_skill.orchestrator.run_filter") as mock_filter, \
          patch("yt_to_skill.orchestrator.run_translate") as mock_translate, \
          patch("yt_to_skill.orchestrator.run_extract") as mock_extract, \
+         patch("yt_to_skill.orchestrator.run_skill") as mock_skill, \
          patch("yt_to_skill.orchestrator.make_openai_client") as mock_openai, \
          patch("yt_to_skill.orchestrator.make_instructor_client") as mock_instructor:
         # Set up filter to return is_strategy=True (need to read filter result JSON)
@@ -80,6 +81,11 @@ def test_run_pipeline_creates_work_directory(config: PipelineConfig, video_id: s
         mock_filter.return_value = mock_filter_result
         mock_translate.return_value = _make_stage_result("translate", config.work_dir, video_id)
         mock_extract.return_value = _make_stage_result("extract", config.work_dir, video_id)
+        mock_skill.return_value = StageResult(
+            stage_name="skill",
+            artifact_path=expected_dir / "SKILL.md",
+            skipped=False,
+        )
 
         run_pipeline(video_id, config)
 
@@ -109,16 +115,27 @@ def test_run_pipeline_calls_stages_in_order(config: PipelineConfig, video_id: st
             return result
         return _inner
 
+    def _track_skill(name: str):
+        def _inner(*args, **kwargs):
+            call_order.append(name)
+            return StageResult(
+                stage_name=name,
+                artifact_path=config.work_dir / video_id / "SKILL.md",
+                skipped=False,
+            )
+        return _inner
+
     with patch("yt_to_skill.orchestrator.run_ingest", side_effect=_track("ingest")), \
          patch("yt_to_skill.orchestrator.run_transcript", side_effect=_track("transcript")), \
          patch("yt_to_skill.orchestrator.run_filter", side_effect=_track("filter")), \
          patch("yt_to_skill.orchestrator.run_translate", side_effect=_track("translate")), \
          patch("yt_to_skill.orchestrator.run_extract", side_effect=_track("extract")), \
+         patch("yt_to_skill.orchestrator.run_skill", side_effect=_track_skill("skill")), \
          patch("yt_to_skill.orchestrator.make_openai_client"), \
          patch("yt_to_skill.orchestrator.make_instructor_client"):
         run_pipeline(video_id, config)
 
-    assert call_order == ["ingest", "transcript", "filter", "translate", "extract"]
+    assert call_order == ["ingest", "transcript", "filter", "translate", "extract", "skill"]
 
 
 # ---------------------------------------------------------------------------
@@ -179,6 +196,7 @@ def test_run_pipeline_returns_list_of_stage_results(config: PipelineConfig, vide
          patch("yt_to_skill.orchestrator.run_filter") as mock_filter, \
          patch("yt_to_skill.orchestrator.run_translate") as mock_translate, \
          patch("yt_to_skill.orchestrator.run_extract") as mock_extract, \
+         patch("yt_to_skill.orchestrator.run_skill") as mock_skill, \
          patch("yt_to_skill.orchestrator.make_openai_client"), \
          patch("yt_to_skill.orchestrator.make_instructor_client"):
         mock_ingest.return_value = _make_stage_result("ingest", config.work_dir, video_id)
@@ -186,12 +204,17 @@ def test_run_pipeline_returns_list_of_stage_results(config: PipelineConfig, vide
         mock_filter.return_value = _make_stage_result("filter", config.work_dir, video_id)
         mock_translate.return_value = _make_stage_result("translate", config.work_dir, video_id)
         mock_extract.return_value = _make_stage_result("extract", config.work_dir, video_id)
+        mock_skill.return_value = StageResult(
+            stage_name="skill",
+            artifact_path=config.work_dir / video_id / "SKILL.md",
+            skipped=False,
+        )
 
         results = run_pipeline(video_id, config)
 
     assert isinstance(results, list)
     assert all(isinstance(r, StageResult) for r in results)
-    assert len(results) == 5
+    assert len(results) == 6
 
 
 # ---------------------------------------------------------------------------
@@ -211,17 +234,25 @@ def test_run_pipeline_all_skipped_on_rerun(config: PipelineConfig, video_id: str
     def _skipped_result(name: str, *args, **kwargs) -> StageResult:
         return _make_stage_result(name, config.work_dir, video_id, skipped=True)
 
+    def _skipped_skill(*args, **kwargs) -> StageResult:
+        return StageResult(
+            stage_name="skill",
+            artifact_path=config.work_dir / video_id / "SKILL.md",
+            skipped=True,
+        )
+
     with patch("yt_to_skill.orchestrator.run_ingest", side_effect=lambda *a, **k: _skipped_result("ingest")), \
          patch("yt_to_skill.orchestrator.run_transcript", side_effect=lambda *a, **k: _skipped_result("transcript")), \
          patch("yt_to_skill.orchestrator.run_filter", side_effect=lambda *a, **k: _skipped_result("filter")), \
          patch("yt_to_skill.orchestrator.run_translate", side_effect=lambda *a, **k: _skipped_result("translate")), \
          patch("yt_to_skill.orchestrator.run_extract", side_effect=lambda *a, **k: _skipped_result("extract")), \
+         patch("yt_to_skill.orchestrator.run_skill", side_effect=_skipped_skill), \
          patch("yt_to_skill.orchestrator.make_openai_client"), \
          patch("yt_to_skill.orchestrator.make_instructor_client"):
         results = run_pipeline(video_id, config)
 
     assert all(r.skipped for r in results), "All stages should be skipped on re-run"
-    assert len(results) == 5
+    assert len(results) == 6
 
 
 # ---------------------------------------------------------------------------
@@ -246,6 +277,7 @@ def test_run_pipeline_creates_llm_clients_once(config: PipelineConfig, video_id:
          patch("yt_to_skill.orchestrator.run_filter") as mock_filter, \
          patch("yt_to_skill.orchestrator.run_translate") as mock_translate, \
          patch("yt_to_skill.orchestrator.run_extract") as mock_extract, \
+         patch("yt_to_skill.orchestrator.run_skill") as mock_skill, \
          patch("yt_to_skill.orchestrator.make_openai_client", return_value=fake_openai_client) as mock_make_openai, \
          patch("yt_to_skill.orchestrator.make_instructor_client", return_value=fake_instructor_client) as mock_make_instructor:
         mock_ingest.return_value = _make_stage_result("ingest", config.work_dir, video_id)
@@ -253,6 +285,11 @@ def test_run_pipeline_creates_llm_clients_once(config: PipelineConfig, video_id:
         mock_filter.return_value = _make_stage_result("filter", config.work_dir, video_id)
         mock_translate.return_value = _make_stage_result("translate", config.work_dir, video_id)
         mock_extract.return_value = _make_stage_result("extract", config.work_dir, video_id)
+        mock_skill.return_value = StageResult(
+            stage_name="skill",
+            artifact_path=config.work_dir / video_id / "SKILL.md",
+            skipped=False,
+        )
 
         run_pipeline(video_id, config)
 
@@ -291,6 +328,7 @@ def test_run_pipeline_handles_stage_errors_gracefully(config: PipelineConfig, vi
          patch("yt_to_skill.orchestrator.run_filter", side_effect=RuntimeError("LLM call failed")), \
          patch("yt_to_skill.orchestrator.run_translate") as mock_translate, \
          patch("yt_to_skill.orchestrator.run_extract") as mock_extract, \
+         patch("yt_to_skill.orchestrator.run_skill") as mock_skill, \
          patch("yt_to_skill.orchestrator.make_openai_client"), \
          patch("yt_to_skill.orchestrator.make_instructor_client"):
         mock_ingest.return_value = _make_stage_result("ingest", config.work_dir, video_id)
