@@ -51,6 +51,7 @@ def test_orchestrator_includes_skill_stage():
          patch("yt_to_skill.orchestrator.run_translate") as mock_translate, \
          patch("yt_to_skill.orchestrator.run_extract") as mock_extract, \
          patch("yt_to_skill.orchestrator.run_skill") as mock_skill, \
+         patch("yt_to_skill.orchestrator.run_keyframes") as mock_keyframes, \
          patch("yt_to_skill.orchestrator.FilterResult") as mock_filter_result, \
          patch("yt_to_skill.orchestrator.make_openai_client"), \
          patch("yt_to_skill.orchestrator.make_instructor_client"):
@@ -61,6 +62,7 @@ def test_orchestrator_includes_skill_stage():
         mock_translate.return_value = mock_results[3]
         mock_extract.return_value = mock_results[4]
         mock_skill.return_value = mock_results[5]
+        mock_keyframes.return_value = StageResult("keyframes", Path("work/v/keyframes.done"), skipped=False)
 
         # Make filter pass as strategy
         filter_data = MagicMock()
@@ -89,6 +91,7 @@ def test_orchestrator_run_pipeline_force_flag():
          patch("yt_to_skill.orchestrator.run_translate") as mock_translate, \
          patch("yt_to_skill.orchestrator.run_extract") as mock_extract, \
          patch("yt_to_skill.orchestrator.run_skill") as mock_skill, \
+         patch("yt_to_skill.orchestrator.run_keyframes") as mock_keyframes, \
          patch("yt_to_skill.orchestrator.FilterResult") as mock_filter_result, \
          patch("yt_to_skill.orchestrator.make_openai_client"), \
          patch("yt_to_skill.orchestrator.make_instructor_client"):
@@ -99,6 +102,7 @@ def test_orchestrator_run_pipeline_force_flag():
         mock_translate.return_value = StageResult("translate", Path("w"), skipped=False)
         mock_extract.return_value = StageResult("extract", Path("w"), skipped=False)
         mock_skill.return_value = skill_result
+        mock_keyframes.return_value = StageResult("keyframes", Path("w/keyframes.done"), skipped=False)
 
         filter_data = MagicMock()
         filter_data.is_strategy = True
@@ -107,8 +111,9 @@ def test_orchestrator_run_pipeline_force_flag():
         config = PipelineConfig(openrouter_api_key="test-key")
         run_pipeline("v", config, force=True)
 
-    _, kwargs = mock_skill.call_args
-    assert kwargs.get("force") is True
+    # run_skill first call (initial render) has force=True
+    first_call_kwargs = mock_skill.call_args_list[0][1]
+    assert first_call_kwargs.get("force") is True
 
 
 # ---------------------------------------------------------------------------
@@ -372,3 +377,92 @@ def test_resolve_error_exits_1(monkeypatch, capsys):
     assert exc_info.value.code == 1
     out = capsys.readouterr()
     assert "NETWORK" in out.out or "NETWORK" in out.err or "connection failed" in out.out or "connection failed" in out.err
+
+
+# ---------------------------------------------------------------------------
+# Keyframe CLI flags
+# ---------------------------------------------------------------------------
+
+
+class TestNoKeyframesFlag:
+    def test_flag_parsed(self, monkeypatch):
+        """--no-keyframes flag is accepted by argparse (no error)."""
+        from yt_to_skill.cli import main
+
+        monkeypatch.setenv("OPENROUTER_API_KEY", "test-key")
+        monkeypatch.setattr("sys.argv", [
+            "yt-to-skill", "https://www.youtube.com/watch?v=vid1xxx",
+            "--no-keyframes",
+        ])
+
+        with patch("yt_to_skill.cli.resolve_urls", return_value=["vid1xxx"]), \
+             patch("yt_to_skill.cli.run_pipeline", return_value=_make_success_results("vid1xxx")):
+            with pytest.raises(SystemExit) as exc_info:
+                main()
+
+        assert exc_info.value.code == 0
+
+    def test_flag_disables_keyframes(self, monkeypatch):
+        """--no-keyframes sets config.keyframes_enabled=False."""
+        from yt_to_skill.cli import main
+
+        monkeypatch.setenv("OPENROUTER_API_KEY", "test-key")
+        monkeypatch.setattr("sys.argv", [
+            "yt-to-skill", "https://www.youtube.com/watch?v=vid1xxx",
+            "--no-keyframes",
+        ])
+
+        captured_config: list = []
+
+        def mock_run_pipeline(video_id, config, *, force=False):
+            captured_config.append(config)
+            return _make_success_results(video_id)
+
+        with patch("yt_to_skill.cli.resolve_urls", return_value=["vid1xxx"]), \
+             patch("yt_to_skill.cli.run_pipeline", side_effect=mock_run_pipeline):
+            with pytest.raises(SystemExit):
+                main()
+
+        assert captured_config[0].keyframes_enabled is False
+
+
+class TestMaxKeyframesFlag:
+    def test_flag_parsed(self, monkeypatch):
+        """--max-keyframes flag is accepted by argparse (no error)."""
+        from yt_to_skill.cli import main
+
+        monkeypatch.setenv("OPENROUTER_API_KEY", "test-key")
+        monkeypatch.setattr("sys.argv", [
+            "yt-to-skill", "https://www.youtube.com/watch?v=vid1xxx",
+            "--max-keyframes", "10",
+        ])
+
+        with patch("yt_to_skill.cli.resolve_urls", return_value=["vid1xxx"]), \
+             patch("yt_to_skill.cli.run_pipeline", return_value=_make_success_results("vid1xxx")):
+            with pytest.raises(SystemExit) as exc_info:
+                main()
+
+        assert exc_info.value.code == 0
+
+    def test_flag_sets_cap(self, monkeypatch):
+        """--max-keyframes N sets config.max_keyframes=N."""
+        from yt_to_skill.cli import main
+
+        monkeypatch.setenv("OPENROUTER_API_KEY", "test-key")
+        monkeypatch.setattr("sys.argv", [
+            "yt-to-skill", "https://www.youtube.com/watch?v=vid1xxx",
+            "--max-keyframes", "7",
+        ])
+
+        captured_config: list = []
+
+        def mock_run_pipeline(video_id, config, *, force=False):
+            captured_config.append(config)
+            return _make_success_results(video_id)
+
+        with patch("yt_to_skill.cli.resolve_urls", return_value=["vid1xxx"]), \
+             patch("yt_to_skill.cli.run_pipeline", side_effect=mock_run_pipeline):
+            with pytest.raises(SystemExit):
+                main()
+
+        assert captured_config[0].max_keyframes == 7

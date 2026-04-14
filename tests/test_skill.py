@@ -13,7 +13,7 @@ from yt_to_skill.models.extraction import (
     TradingLogicExtraction,
 )
 from yt_to_skill.stages.base import StageResult
-from yt_to_skill.stages.skill import render_skill_md, run_skill
+from yt_to_skill.stages.skill import render_gallery_section, render_skill_md, run_skill
 
 
 # ---------------------------------------------------------------------------
@@ -324,3 +324,57 @@ class TestRunSkill:
         # Don't create extracted_logic.json
         with pytest.raises(FormatError):
             run_skill(video_id=video_id, work_dir=work_dir, skills_dir=skills_dir)
+
+
+# ---------------------------------------------------------------------------
+# Gallery section tests
+# ---------------------------------------------------------------------------
+
+
+class TestGallerySection:
+    def test_renders_gallery(self):
+        """render_gallery_section with two keyframes produces correct output."""
+        paths = [Path("keyframe_0142.png"), Path("keyframe_0310.png")]
+        result = render_gallery_section(paths)
+        assert "## Chart References" in result
+        assert "**1:42**" in result
+        assert "**3:10**" in result
+        assert "![](assets/keyframe_0142.png)" in result
+        assert "![](assets/keyframe_0310.png)" in result
+
+    def test_empty_returns_empty(self):
+        """render_gallery_section([]) returns empty string."""
+        result = render_gallery_section([])
+        assert result == ""
+
+    def test_gallery_in_full_render(self):
+        """render_skill_md with keyframe_paths includes gallery section."""
+        extraction = make_extraction()
+        paths = [Path("keyframe_0100.png"), Path("keyframe_0200.png")]
+        output = render_skill_md(extraction, keyframe_paths=paths)
+        assert "## Chart References" in output
+        assert "**1:00**" in output
+        assert "**2:00**" in output
+
+    def test_no_gallery_by_default(self):
+        """render_skill_md without keyframe_paths has no gallery section."""
+        extraction = make_extraction()
+        output = render_skill_md(extraction)
+        assert "## Chart References" not in output
+
+    def test_gallery_at_bottom(self):
+        """Gallery section appears after all strategy sections."""
+        extraction = make_extraction()
+        paths = [Path("keyframe_0142.png")]
+        output = render_skill_md(extraction, keyframe_paths=paths)
+        market_idx = output.rindex("## Market Regime Filters")
+        gallery_idx = output.index("## Chart References")
+        assert gallery_idx > market_idx
+
+    def test_gallery_sorted_by_timestamp(self):
+        """Keyframes are sorted by filename (chronological order)."""
+        paths = [Path("keyframe_0310.png"), Path("keyframe_0142.png")]
+        result = render_gallery_section(paths)
+        idx_142 = result.index("keyframe_0142")
+        idx_310 = result.index("keyframe_0310")
+        assert idx_142 < idx_310

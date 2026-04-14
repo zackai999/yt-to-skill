@@ -133,6 +133,18 @@ def main() -> None:
         action="store_true",
         help="Show full debug logs",
     )
+    parser.add_argument(
+        "--no-keyframes",
+        action="store_true",
+        help="Skip keyframe extraction",
+    )
+    parser.add_argument(
+        "--max-keyframes",
+        type=int,
+        default=None,
+        metavar="N",
+        help="Maximum keyframes per video (default: 20)",
+    )
 
     args = parser.parse_args()
 
@@ -153,6 +165,12 @@ def main() -> None:
 
     if args.output_dir is not None:
         config = config.model_copy(update={"skills_dir": Path(args.output_dir)})
+
+    if args.no_keyframes:
+        config = config.model_copy(update={"keyframes_enabled": False})
+
+    if args.max_keyframes is not None:
+        config = config.model_copy(update={"max_keyframes": args.max_keyframes})
 
     # ── Resolve URLs ───────────────────────────────────────────────────────
     try:

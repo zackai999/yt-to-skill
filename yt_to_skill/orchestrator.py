@@ -9,6 +9,7 @@ Usage:
 
 from __future__ import annotations
 
+import shutil
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
@@ -21,6 +22,7 @@ from yt_to_skill.stages.base import StageResult
 from yt_to_skill.stages.extract import run_extract
 from yt_to_skill.stages.filter import run_filter
 from yt_to_skill.stages.ingest import run_ingest
+from yt_to_skill.stages.keyframe import run_keyframes
 from yt_to_skill.stages.skill import run_skill
 from yt_to_skill.stages.transcript import run_transcript
 from yt_to_skill.stages.translate import run_translate
@@ -241,7 +243,7 @@ def run_pipeline(
         )
 
     # -----------------------------------------------------------------------
-    # Stage 6: Skill generation
+    # Stage 6: Skill generation (initial render without gallery)
     # -----------------------------------------------------------------------
     try:
         skill_result = run_skill(video_id, work_dir, config.skills_dir, force=force)
@@ -262,5 +264,67 @@ def run_pipeline(
                 error=str(exc),
             )
         )
+
+    # -----------------------------------------------------------------------
+    # Stage 7: Keyframe extraction (optional — errors do not abort pipeline)
+    # -----------------------------------------------------------------------
+    if config.keyframes_enabled:
+        try:
+            keyframe_result = run_keyframes(video_id, work_dir, config)
+            results.append(keyframe_result)
+            status = "skipped" if keyframe_result.skipped else "completed"
+            logger.info("Stage: keyframes — {}", status)
+
+            # Copy PNGs from work dir to skills assets/ directory
+            if keyframe_result.error is None:
+                keyframes_src = work_dir / video_id / "keyframes"
+                assets_dst = config.skills_dir / video_id / "assets"
+                assets_dst.mkdir(parents=True, exist_ok=True)
+
+                png_count = 0
+                if keyframes_src.exists():
+                    for png in keyframes_src.glob("*.png"):
+                        shutil.copy2(png, assets_dst / png.name)
+                        png_count += 1
+
+                # Collect copied keyframe paths for gallery
+                keyframe_asset_paths = sorted(
+                    (assets_dst / p.name) for p in keyframes_src.glob("keyframe_*.png")
+                ) if keyframes_src.exists() else []
+
+                # Re-render SKILL.md with gallery if keyframes were extracted
+                if keyframe_asset_paths:
+                    try:
+                        run_skill(
+                            video_id,
+                            work_dir,
+                            config.skills_dir,
+                            force=True,
+                            keyframe_paths=keyframe_asset_paths,
+                        )
+                        logger.info(
+                            "Stage: skill — re-rendered with {} keyframe(s) in gallery",
+                            len(keyframe_asset_paths),
+                        )
+                    except Exception as re_render_exc:  # noqa: BLE001
+                        logger.warning(
+                            "Stage: skill — gallery re-render failed: {}",
+                            re_render_exc,
+                        )
+
+        except Exception as exc:  # noqa: BLE001
+            logger.error(
+                "Stage: keyframes — ERROR | video_id={} | error={} (pipeline continues)",
+                video_id,
+                exc,
+            )
+            results.append(
+                StageResult(
+                    stage_name="keyframes",
+                    artifact_path=work_dir / video_id / "keyframes.done",
+                    skipped=False,
+                    error=str(exc),
+                )
+            )
 
     return results

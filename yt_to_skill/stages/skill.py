@@ -4,7 +4,10 @@ Converts an extracted_logic.json artifact into an installable Claude skill
 following the Agent Skills specification: YAML frontmatter + four-section body.
 """
 
+from __future__ import annotations
+
 from pathlib import Path
+from typing import Optional
 
 import yaml
 from loguru import logger
@@ -121,11 +124,48 @@ def _render_strategy_block(strategy: StrategyObject, prefix: str = "") -> str:
 
 
 # ---------------------------------------------------------------------------
+# Gallery rendering
+# ---------------------------------------------------------------------------
+
+
+def render_gallery_section(keyframe_paths: list[Path]) -> str:
+    """Render a ## Chart References gallery section from keyframe PNG paths.
+
+    Args:
+        keyframe_paths: List of Path objects for keyframe PNGs.
+            Expected filename stem format: keyframe_MMSS (e.g. keyframe_0142.png)
+
+    Returns:
+        Markdown string with gallery section, or empty string if no paths given.
+    """
+    if not keyframe_paths:
+        return ""
+
+    lines: list[str] = ["\n## Chart References\n"]
+    for path in sorted(keyframe_paths):
+        stem = path.stem  # e.g. "keyframe_0142"
+        # Extract MMSS portion after the underscore
+        raw = stem.split("_", 1)[1] if "_" in stem else stem  # "0142"
+        try:
+            minutes = int(raw[:2])
+            seconds = int(raw[2:])
+        except (ValueError, IndexError):
+            minutes = 0
+            seconds = 0
+        lines.append(f"**{minutes}:{seconds:02d}** -- ![](assets/{path.name})")
+
+    return "\n".join(lines)
+
+
+# ---------------------------------------------------------------------------
 # Public API
 # ---------------------------------------------------------------------------
 
 
-def render_skill_md(extraction: TradingLogicExtraction) -> str:
+def render_skill_md(
+    extraction: TradingLogicExtraction,
+    keyframe_paths: Optional[list[Path]] = None,
+) -> str:
     """Render a TradingLogicExtraction to a SKILL.md string.
 
     Produces:
@@ -133,6 +173,13 @@ def render_skill_md(extraction: TradingLogicExtraction) -> str:
     - Four-section body per strategy (Strategy Overview, Entry/Exit Criteria,
       Risk Management, Market Regime Filters)
     - REQUIRES_SPECIFICATION inline callouts within relevant sections
+    - Optional ## Chart References gallery when keyframe_paths provided
+
+    Args:
+        extraction: Parsed trading logic from the extract stage.
+        keyframe_paths: Optional list of keyframe PNG paths. When provided,
+            a gallery section is appended. Backward compatible: callers that
+            pass no argument get the same output as before.
     """
     # ── Frontmatter ────────────────────────────────────────────────────────
     name = extraction.video_id.lower()[:_MAX_NAME]
@@ -173,7 +220,12 @@ def render_skill_md(extraction: TradingLogicExtraction) -> str:
 
     body = "\n".join(body_lines)
 
-    return frontmatter_block + body
+    # ── Gallery (optional) ─────────────────────────────────────────────────
+    gallery = ""
+    if keyframe_paths:
+        gallery = render_gallery_section(keyframe_paths)
+
+    return frontmatter_block + body + gallery
 
 
 def run_skill(
@@ -182,6 +234,7 @@ def run_skill(
     skills_dir: Path,
     *,
     force: bool = False,
+    keyframe_paths: Optional[list[Path]] = None,
 ) -> StageResult:
     """Execute the skill generation stage.
 
@@ -193,6 +246,8 @@ def run_skill(
         work_dir: Root working directory containing stage artifacts.
         skills_dir: Root directory where skill packages are installed.
         force: When True, regenerate even if SKILL.md already exists.
+        keyframe_paths: Optional list of keyframe PNG paths to include as a
+            gallery section in SKILL.md.
 
     Returns:
         StageResult with stage_name="skill".
@@ -227,7 +282,7 @@ def run_skill(
     (skill_dir / "references").mkdir(exist_ok=True)
 
     # Render and write SKILL.md
-    content = render_skill_md(extraction)
+    content = render_skill_md(extraction, keyframe_paths=keyframe_paths)
     skill_path.write_text(content, encoding="utf-8")
     logger.info("Skill written to {path}", path=skill_path)
 
