@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: "Completed 02-output-and-cli/02-01-PLAN.md"
-last_updated: "2026-04-13T23:10:28Z"
+stopped_at: Completed 02-output-and-cli/02-02-PLAN.md
+last_updated: "2026-04-14T06:20:36.091Z"
 last_activity: 2026-04-14 — Completed plan 02-01 (errors + skill stage)
 progress:
   total_phases: 3
-  completed_phases: 1
-  total_plans: 6
-  completed_plans: 6
+  completed_phases: 2
+  total_plans: 7
+  completed_plans: 7
   percent: 40
 ---
 
@@ -56,6 +56,7 @@ Progress: [████░░░░░░] 40%
 | Phase 01-text-pipeline P04 | 8min | 2 tasks | 4 files |
 | Phase 01-text-pipeline P05 | 3min | 2 tasks | 4 files |
 | Phase 02-output-and-cli P01 | 2min | 1 task (TDD) | 4 files |
+| Phase 02-output-and-cli P02 | 8min | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -84,6 +85,9 @@ Recent decisions affecting current work:
 - [Phase 02-output-and-cli]: REQUIRES_SPECIFICATION markers placed inline within Entry/Exit Criteria section — not as a top-level section
 - [Phase 02-output-and-cli]: yaml.dump used for SKILL.md frontmatter serialization to guarantee valid YAML
 - [Phase 02-output-and-cli]: run_skill wraps FileNotFoundError and ValidationError as FormatError for unified caller interface
+- [Phase 02-output-and-cli]: resolve_urls() tries extract_video_id() first for zero-network single-video detection before falling back to yt-dlp
+- [Phase 02-output-and-cli]: force parameter added to run_pipeline() signature (not to PipelineConfig) — keeps config serializable
+- [Phase 02-output-and-cli]: Non-strategy detection in CLI: last StageResult.stage_name == 'filter' with no error signals non-strategy stop
 
 ### Pending Todos
 
@@ -97,6 +101,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-13T23:10:28Z
-Stopped at: Completed 02-output-and-cli/02-01-PLAN.md
-Resume file: .planning/phases/02-output-and-cli/02-01-SUMMARY.md
+Last session: 2026-04-14T06:20:36.089Z
+Stopped at: Completed 02-output-and-cli/02-02-PLAN.md
+Resume file: None

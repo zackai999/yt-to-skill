@@ -13,7 +13,7 @@ Build a local Python CLI pipeline in three delivery phases. Phase 1 establishes 
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [ ] **Phase 1: Text Pipeline** - Extract, translate, and structure trading logic from any YouTube video URL to validated JSON on disk
-- [ ] **Phase 2: Output and CLI** - Generate installable SKILL.md files and expose the full pipeline via CLI for single video, playlist, and channel URLs
+- [x] **Phase 2: Output and CLI** - Generate installable SKILL.md files and expose the full pipeline via CLI for single video, playlist, and channel URLs (completed 2026-04-14)
 - [ ] **Phase 3: Visual Enrichment** - Extract keyframes from downloaded trading videos and populate SKILL.md assets/ with chart screenshots
 
 ## Phase Details
@@ -46,7 +46,7 @@ Plans:
   2. User can run `yt-to-skill <playlist-or-channel-url>` and have all videos processed in batch; a single failed video does not abort the run
   3. Generated SKILL.md includes `assets/`, `scripts/`, and `references/` directory scaffold regardless of keyframe content
   4. Error messages distinguish network failures, extraction failures, LLM failures, and format failures with actionable descriptions
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 
 Plans:
 - [ ] 02-01-PLAN.md — Typed error hierarchy and SKILL.md generation stage
@@ -69,5 +69,5 @@ Phases execute in numeric order: 1 → 2 → 3
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Text Pipeline | 4/5 | In Progress|  |
-| 2. Output and CLI | 1/2 | In Progress|  |
+| 2. Output and CLI | 2/2 | Complete   | 2026-04-14 |
 | 3. Visual Enrichment | 0/TBD | Not started | - |
