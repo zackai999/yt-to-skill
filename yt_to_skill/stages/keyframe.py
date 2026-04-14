@@ -1,7 +1,8 @@
-"""Keyframe extraction stage: scene detection, frame capping, perceptual dedup."""
+"""Keyframe extraction stage: scene detection, interval sampling, perceptual dedup."""
 
 from pathlib import Path
 
+import cv2
 import imagehash
 import scenedetect
 from loguru import logger
@@ -13,6 +14,15 @@ from scenedetect.scene_manager import save_images
 from yt_to_skill.config import PipelineConfig
 from yt_to_skill.stages.base import StageResult
 from yt_to_skill.stages.ingest import download_video
+
+# Scenes longer than this (seconds) get change-detected for extra captures
+_LONG_SCENE_THRESHOLD = 45
+# Check for changes every N seconds within long scenes
+_PROBE_INTERVAL = 3
+# Mean pixel diff (0-255) above which we consider a frame "changed"
+_CHANGE_THRESHOLD = 4.0
+# Minimum seconds between captured frames (cooldown to avoid burst captures)
+_MIN_CAPTURE_GAP = 10
 
 
 def timecode_to_filename(timecode) -> str:
@@ -58,17 +68,95 @@ def deduplicate_frames(frame_paths: list[Path], threshold: int = 10) -> list[Pat
     return kept
 
 
+def _seconds_to_filename(total_seconds: int) -> str:
+    """Convert a timestamp in seconds to a keyframe_MMSS.png filename."""
+    mm = total_seconds // 60
+    ss = total_seconds % 60
+    return f"keyframe_{mm:02d}{ss:02d}.png"
+
+
+def _sample_long_scenes(
+    video_path: Path,
+    scene_list: list,
+    output_dir: Path,
+    max_keyframes: int,
+) -> list[Path]:
+    """Capture extra frames from long scenes when visual changes occur.
+
+    Instead of uniform interval sampling, probes every _PROBE_INTERVAL seconds
+    and captures a frame only when the mean pixel difference vs. the last
+    captured frame exceeds _CHANGE_THRESHOLD. This catches moments when the
+    trader draws annotations, switches timeframes, or zooms — while skipping
+    idle periods where the chart barely moves.
+
+    A cooldown (_MIN_CAPTURE_GAP) prevents burst captures during rapid drawing.
+
+    Returns list of saved PNG paths.
+    """
+    cap = cv2.VideoCapture(str(video_path))
+    fps = cap.get(cv2.CAP_PROP_FPS) or 30.0
+    extra_frames: list[Path] = []
+
+    for start_tc, end_tc in scene_list:
+        if len(extra_frames) >= max_keyframes:
+            break
+        start_s = int(start_tc.get_seconds())
+        end_s = int(end_tc.get_seconds())
+        duration = end_s - start_s
+        if duration < _LONG_SCENE_THRESHOLD:
+            continue
+
+        # Read the scene-start frame as our baseline
+        cap.set(cv2.CAP_PROP_POS_FRAMES, int(start_s * fps))
+        ret, prev_frame = cap.read()
+        if not ret:
+            continue
+        prev_gray = cv2.cvtColor(prev_frame, cv2.COLOR_BGR2GRAY)
+        last_capture_t = start_s
+
+        # Probe at regular intervals, capture only on change
+        for t in range(start_s + _PROBE_INTERVAL, end_s, _PROBE_INTERVAL):
+            if len(extra_frames) >= max_keyframes:
+                break
+
+            cap.set(cv2.CAP_PROP_POS_FRAMES, int(t * fps))
+            ret, frame = cap.read()
+            if not ret:
+                continue
+
+            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            diff = cv2.absdiff(prev_gray, gray).mean()
+
+            if diff >= _CHANGE_THRESHOLD and (t - last_capture_t) >= _MIN_CAPTURE_GAP:
+                fname = _seconds_to_filename(t)
+                dest = output_dir / fname
+                if not dest.exists():
+                    cv2.imwrite(str(dest), frame)
+                    extra_frames.append(dest)
+                    last_capture_t = t
+                # Update baseline to the captured frame so we detect the
+                # NEXT change relative to this one, not the scene start
+                prev_gray = gray
+
+    cap.release()
+    logger.info(
+        "Change-detected {n} extra frames from long scenes", n=len(extra_frames)
+    )
+    return extra_frames
+
+
 def run_keyframes(video_id: str, work_dir: Path, config: PipelineConfig) -> StageResult:
-    """Extract keyframes from a YouTube video using scene detection.
+    """Extract keyframes from a YouTube video using scene detection + interval sampling.
 
     1. Sentinel guard: skip if keyframes.done exists.
     2. Download video (720p cap) via download_video().
     3. Detect scene transitions with AdaptiveDetector.
     4. Cap at config.max_keyframes scenes.
     5. Save one PNG per scene, rename to timestamp format.
-    6. Deduplicate near-identical frames via pHash.
-    7. Delete video file.
-    8. Write sentinel file.
+    6. Interval-sample extra frames from long scenes (>60s).
+    7. Deduplicate near-identical frames via pHash.
+    8. Delete video file.
+    9. Write sentinel file.
 
     Args:
         video_id: YouTube video ID
@@ -145,8 +233,16 @@ def run_keyframes(video_id: str, work_dir: Path, config: PipelineConfig) -> Stag
         raw_png.rename(dest)
         renamed.append(dest)
 
-    # Deduplicate by perceptual hash
-    kept_frames = deduplicate_frames(renamed, threshold=10)
+    # Interval-sample extra frames from long scenes
+    remaining_cap = config.max_keyframes - len(renamed)
+    if remaining_cap > 0:
+        extra = _sample_long_scenes(video_path, scene_list, output_dir, remaining_cap)
+        renamed.extend(extra)
+        renamed.sort(key=lambda p: p.name)
+
+    # Deduplicate by perceptual hash (threshold=5 to distinguish chart states
+    # that share the same TradingView layout but show different data/annotations)
+    kept_frames = deduplicate_frames(renamed, threshold=5)
     removed = set(renamed) - set(kept_frames)
     for dup in removed:
         dup.unlink()
