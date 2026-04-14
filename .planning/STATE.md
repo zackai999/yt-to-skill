@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 03-visual-enrichment-03-01-PLAN.md
-last_updated: "2026-04-14T06:57:59.449Z"
+stopped_at: "Checkpoint 03-02 Task 2: human-verify keyframe calibration on real trading videos"
+last_updated: "2026-04-14T07:04:48.209Z"
 last_activity: 2026-04-14 — Completed plan 02-01 (errors + skill stage)
 progress:
   total_phases: 3
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 9
-  completed_plans: 8
+  completed_plans: 9
   percent: 40
 ---
 
@@ -58,6 +58,7 @@ Progress: [████░░░░░░] 40%
 | Phase 02-output-and-cli P01 | 2min | 1 task (TDD) | 4 files |
 | Phase 02-output-and-cli P02 | 8min | 2 tasks | 8 files |
 | Phase 03-visual-enrichment P01 | 5min | 2 tasks | 6 files |
+| Phase 03-visual-enrichment P02 | 8min | 1 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -92,6 +93,9 @@ Recent decisions affecting current work:
 - [Phase 03-visual-enrichment]: save_images(scene_list, video, ...) signature: scene_list first arg — known PySceneDetect pitfall
 - [Phase 03-visual-enrichment]: Solid-color images produce identical pHash — tests must use structured patterns (checkerboard/gradient)
 - [Phase 03-visual-enrichment]: Sentinel keyframes.done written with frame count after extraction; video deleted to save disk space
+- [Phase 03-visual-enrichment]: render_gallery_section returns empty string for empty list — backward-compatible optional gallery in render_skill_md
+- [Phase 03-visual-enrichment]: Keyframe stage errors do not abort pipeline — keyframes are nice-to-have, logged and appended as error StageResult
+- [Phase 03-visual-enrichment]: SKILL.md re-rendered with gallery after keyframes extracted — run_skill called twice (Stage 6 initial, Stage 7 with keyframe_paths)
 
 ### Pending Todos
 
@@ -105,6 +109,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-14T06:57:59.447Z
-Stopped at: Completed 03-visual-enrichment-03-01-PLAN.md
+Last session: 2026-04-14T07:04:48.207Z
+Stopped at: Checkpoint 03-02 Task 2: human-verify keyframe calibration on real trading videos
 Resume file: None
