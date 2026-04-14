@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase 3 context gathered
-last_updated: "2026-04-14T06:34:08.143Z"
+stopped_at: Completed 03-visual-enrichment-03-01-PLAN.md
+last_updated: "2026-04-14T06:57:59.449Z"
 last_activity: 2026-04-14 — Completed plan 02-01 (errors + skill stage)
 progress:
   total_phases: 3
   completed_phases: 2
-  total_plans: 7
-  completed_plans: 7
+  total_plans: 9
+  completed_plans: 8
   percent: 40
 ---
 
@@ -57,6 +57,7 @@ Progress: [████░░░░░░] 40%
 | Phase 01-text-pipeline P05 | 3min | 2 tasks | 4 files |
 | Phase 02-output-and-cli P01 | 2min | 1 task (TDD) | 4 files |
 | Phase 02-output-and-cli P02 | 8min | 2 tasks | 8 files |
+| Phase 03-visual-enrichment P01 | 5min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -88,6 +89,9 @@ Recent decisions affecting current work:
 - [Phase 02-output-and-cli]: resolve_urls() tries extract_video_id() first for zero-network single-video detection before falling back to yt-dlp
 - [Phase 02-output-and-cli]: force parameter added to run_pipeline() signature (not to PipelineConfig) — keeps config serializable
 - [Phase 02-output-and-cli]: Non-strategy detection in CLI: last StageResult.stage_name == 'filter' with no error signals non-strategy stop
+- [Phase 03-visual-enrichment]: save_images(scene_list, video, ...) signature: scene_list first arg — known PySceneDetect pitfall
+- [Phase 03-visual-enrichment]: Solid-color images produce identical pHash — tests must use structured patterns (checkerboard/gradient)
+- [Phase 03-visual-enrichment]: Sentinel keyframes.done written with frame count after extraction; video deleted to save disk space
 
 ### Pending Todos
 
@@ -101,6 +105,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-14T06:34:08.140Z
-Stopped at: Phase 3 context gathered
-Resume file: .planning/phases/03-visual-enrichment/03-CONTEXT.md
+Last session: 2026-04-14T06:57:59.447Z
+Stopped at: Completed 03-visual-enrichment-03-01-PLAN.md
+Resume file: None

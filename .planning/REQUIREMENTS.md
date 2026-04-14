@@ -12,7 +12,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **INPT-01**: User can extract transcript from any YouTube video with captions via youtube-transcript-api
 - [x] **INPT-02**: User can extract transcript from caption-less videos via Whisper (Belle-whisper-large-v3-zh)
 - [x] **INPT-03**: User can download video locally via yt-dlp for audio extraction and keyframe capture
-- [ ] **INPT-04**: User can extract keyframes from trading videos via PySceneDetect capturing chart transitions and indicator setups
+- [x] **INPT-04**: User can extract keyframes from trading videos via PySceneDetect capturing chart transitions and indicator setups
 - [x] **INPT-05**: Pipeline skips already-processed videos using download archive (idempotent)
 
 ### Translation & Extraction
@@ -72,7 +72,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | INPT-01 | Phase 1 | Complete |
 | INPT-02 | Phase 1 | Complete |
 | INPT-03 | Phase 1 | Complete |
-| INPT-04 | Phase 3 | Pending |
+| INPT-04 | Phase 3 | Complete |
 | INPT-05 | Phase 1 | Complete |
 | EXTR-01 | Phase 1 | Complete |
 | EXTR-02 | Phase 1 | Complete |
