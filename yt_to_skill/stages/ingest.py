@@ -117,3 +117,55 @@ def download_audio(video_id: str, work_dir: Path, config: PipelineConfig) -> Pat
 
     logger.info("Audio downloaded to {path}", path=audio_files[0])
     return audio_files[0]
+
+
+def download_video(video_id: str, work_dir: Path, config: PipelineConfig) -> Path:
+    """Download video at 720p cap for a video.
+
+    Artifact guard: if any video.* file already exists in work_dir/<video_id>/,
+    returns the existing path without downloading.
+
+    Args:
+        video_id: YouTube video ID
+        work_dir: Root directory for pipeline artifacts
+        config: Pipeline configuration
+
+    Returns:
+        Path to the downloaded video file
+
+    Raises:
+        FileNotFoundError: If download completes but no video file is found
+    """
+    video_dir = work_dir / video_id
+    video_dir.mkdir(parents=True, exist_ok=True)
+
+    # Artifact guard: check for existing video file
+    existing = list(video_dir.glob("video.*"))
+    if existing:
+        logger.info("Video already exists at {path} — skipping download", path=existing[0])
+        return existing[0]
+
+    url = f"https://www.youtube.com/watch?v={video_id}"
+    ydl_opts = {
+        "format": "bestvideo[height<=720][ext=mp4]+bestaudio/best[height<=720]/best[height<=720]",
+        "outtmpl": str(video_dir / "video.%(ext)s"),
+        "merge_output_format": "mp4",
+        "fragment_retries": 3,
+        "quiet": True,
+        "no_warnings": True,
+    }
+
+    logger.info("Downloading video for video {video_id}", video_id=video_id)
+
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        ydl.download([url])
+
+    # Find the downloaded video file
+    video_files = list(video_dir.glob("video.*"))
+    if not video_files:
+        raise FileNotFoundError(
+            f"Video download for video {video_id!r} produced no output file"
+        )
+
+    logger.info("Video downloaded to {path}", path=video_files[0])
+    return video_files[0]

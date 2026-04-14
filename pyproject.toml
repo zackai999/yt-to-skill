@@ -14,6 +14,8 @@ dependencies = [
     "tenacity>=8.3.0",
     "loguru>=0.7.2",
     "langdetect>=1.0.9",
+    "scenedetect[opencv-headless]>=0.6.7",
+    "imagehash>=4.3.2",
 ]
 
 [project.scripts]

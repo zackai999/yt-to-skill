@@ -21,5 +21,7 @@ class PipelineConfig(BaseSettings):
     whisper_compute_type: str = "int8"
     max_tokens_translation: int = 4096
     max_tokens_extraction: int = 4096
+    max_keyframes: int = 20
+    keyframes_enabled: bool = True
 
     model_config = {"env_file": ".env"}
