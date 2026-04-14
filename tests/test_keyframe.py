@@ -4,6 +4,7 @@ from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
+from PIL import Image
 
 from yt_to_skill.config import PipelineConfig
 
@@ -18,6 +19,12 @@ def _make_config(tmp_path: Path) -> PipelineConfig:
         openrouter_api_key="test-key",
         work_dir=tmp_path,
     )
+
+
+def _make_png(path: Path, color: tuple = (128, 128, 128)) -> Path:
+    """Create a minimal valid 8x8 PNG at path with given RGB color."""
+    Image.new("RGB", (8, 8), color=color).save(path)
+    return path
 
 
 # ---------------------------------------------------------------------------
@@ -151,15 +158,20 @@ class TestDedup:
 
     def test_keeps_distinct(self, tmp_path: Path) -> None:
         """deduplicate_frames keeps visually distinct frames."""
+        import numpy as np
         from PIL import Image
 
         from yt_to_skill.stages.keyframe import deduplicate_frames
 
         frame_a = tmp_path / "frame_a.png"
         frame_b = tmp_path / "frame_b.png"
-        # Visually very different: red vs blue
-        Image.new("RGB", (64, 64), color=(200, 0, 0)).save(frame_a)
-        Image.new("RGB", (64, 64), color=(0, 0, 200)).save(frame_b)
+        # Use visually distinct patterns: checkerboard vs gradient.
+        # Solid colors produce identical pHash (all-uniform images), so use
+        # structured patterns that have different frequency content.
+        checkerboard = np.uint8([[255 if (i + j) % 2 == 0 else 0 for j in range(64)] for i in range(64)])
+        gradient = np.uint8([[int(i * 4) for j in range(64)] for i in range(64)])
+        Image.fromarray(checkerboard).save(frame_a)
+        Image.fromarray(gradient).save(frame_b)
 
         result = deduplicate_frames([frame_a, frame_b], threshold=10)
         assert len(result) == 2
@@ -217,13 +229,13 @@ class TestRunKeyframes:
 
         def fake_save_images(scene_list, video, **kwargs):
             saved_scene_lists.append(scene_list)
-            # Create PNG stubs for each scene
+            # Create valid minimal PNG files for each scene
             output_dir = Path(kwargs.get("output_dir", str(keyframes_dir)))
             for idx, (start_tc, _) in enumerate(scene_list):
                 secs = int(start_tc.get_seconds())
                 mm = secs // 60
                 ss = secs % 60
-                (output_dir / f"keyframe_{mm:02d}{ss:02d}.png").touch()
+                _make_png(output_dir / f"keyframe_{mm:02d}{ss:02d}.png")
 
         mock_video = MagicMock()
         mock_manager = MagicMock()
@@ -265,7 +277,7 @@ class TestRunKeyframes:
 
         def fake_save_images(scene_list, video, **kwargs):
             output_dir = Path(kwargs.get("output_dir", str(keyframes_dir)))
-            (output_dir / "keyframe_0000.png").touch()
+            _make_png(output_dir / "keyframe_0000.png")
 
         mock_video = MagicMock()
         mock_manager = MagicMock()
