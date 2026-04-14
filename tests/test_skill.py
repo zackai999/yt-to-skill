@@ -90,11 +90,8 @@ class TestRenderSkillMdFrontmatter:
         fm = yaml.safe_load(parts[1])
         assert "name" in fm
         assert "description" in fm
-        assert "metadata" in fm
-        meta = fm["metadata"]
-        assert "version" in meta
-        assert "source_url" in meta
-        assert "source_language" in meta
+        assert "user-invocable" in fm
+        assert "allowed-tools" in fm
 
     def test_name_field_lowercase(self):
         extraction = make_extraction(video_id="ABC_DEF")
@@ -111,14 +108,14 @@ class TestRenderSkillMdFrontmatter:
         fm = yaml.safe_load(parts[1])
         assert len(fm["name"]) <= 64
 
-    def test_description_field_max_1024(self):
+    def test_description_field_max_1536(self):
         # Strategy with very long name
         strategy = make_strategy(name="S" * 2000)
         extraction = make_extraction(strategies=[strategy])
         output = render_skill_md(extraction)
         parts = output.split("---\n", 2)
         fm = yaml.safe_load(parts[1])
-        assert len(fm["description"]) <= 1024
+        assert len(fm["description"]) <= 1536
 
     def test_description_includes_strategy_names(self):
         strategy = make_strategy(name="MomentumBreakout")

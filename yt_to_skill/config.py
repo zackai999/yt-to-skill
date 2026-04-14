@@ -14,9 +14,9 @@ class PipelineConfig(BaseSettings):
     openrouter_api_key: str
     work_dir: Path = Path("work")
     skills_dir: Path = Path("skills")
-    translation_model: str = "anthropic/claude-sonnet-4-20250514"
-    extraction_model: str = "anthropic/claude-sonnet-4-20250514"
-    filter_model: str = "mistralai/mistral-7b-instruct"
+    translation_model: str = "anthropic/claude-sonnet-4.6"
+    extraction_model: str = "anthropic/claude-sonnet-4.6"
+    filter_model: str = "mistralai/mistral-small-2603"
     whisper_device: str = "cpu"
     whisper_compute_type: str = "int8"
     max_tokens_translation: int = 4096

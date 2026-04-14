@@ -125,6 +125,15 @@ class TestMetadataPrefilter:
         )
         assert passed is True
 
+    def test_title_strategy_keyword_outweighs_description_noise(self):
+        """Strategy keyword in title (3x weight) should outweigh non-strategy in description."""
+        passed, reason = metadata_prefilter(
+            title="公开策略分析",
+            description="#btcnews #比特幣新聞 news recap",
+            tags=[],
+        )
+        assert passed is True
+
     def test_empty_inputs_returns_false(self):
         """Empty title/description/tags should fail (no strategy indicators)."""
         passed, reason = metadata_prefilter(title="", description="", tags=[])

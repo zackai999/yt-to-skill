@@ -15,7 +15,9 @@ A video is NOT_STRATEGY if it primarily presents:
 - Motivational or lifestyle content
 - Product/service promotions
 
-STRICT THRESHOLD: When in doubt, classify as NOT_STRATEGY. Only classify as STRATEGY if there are clear entry conditions, exit conditions, or specific indicator setups discussed.
+IMPORTANT: The transcript may be in Chinese or another language. Look for trading strategy signals in ANY language. Chinese trading terms include: 策略 (strategy), 做空/做多 (short/long), 止损 (stop loss), 止盈 (take profit), 入场 (entry), 出场 (exit), 突破 (breakout), 支撑 (support), 阻力 (resistance), 布局 (position setup), 压力位 (resistance level), 止损点 (stop loss point).
+
+THRESHOLD: When in doubt for non-English content, lean toward STRATEGY if numerical price levels and directional trading terms are present. Only classify as NOT_STRATEGY if the content is clearly general commentary, news, or education without actionable rules.
 
 OUTPUT FORMAT (respond with exactly this structure):
 Line 1: STRATEGY or NOT_STRATEGY

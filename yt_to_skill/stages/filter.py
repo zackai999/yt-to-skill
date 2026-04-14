@@ -48,7 +48,9 @@ def metadata_prefilter(
 ) -> tuple[bool, str]:
     """Score video metadata for strategy vs. non-strategy indicators.
 
-    Scores: +1 for each STRATEGY_KEYWORD found, -1 for each NON_STRATEGY_KEYWORD.
+    Title keywords are weighted 3x (author-chosen, high signal).
+    Description/tags keywords are weighted 1x (often contain hashtag spam).
+    Non-strategy keywords are weighted -1 regardless of location.
     If score <= 0: return (False, reason). If score > 0: return (True, reason).
 
     Args:
@@ -59,14 +61,19 @@ def metadata_prefilter(
     Returns:
         (passed, reason) tuple — passed is True when metadata suggests strategy content.
     """
-    combined = " ".join([title, description, *tags]).lower()
+    title_lower = title.lower()
+    desc_tags = " ".join([description, *tags]).lower()
 
     score = 0
     for kw in STRATEGY_KEYWORDS:
-        if kw in combined:
+        if kw in title_lower:
+            score += 3
+        elif kw in desc_tags:
             score += 1
     for kw in NON_STRATEGY_KEYWORDS:
-        if kw in combined:
+        if kw in title_lower:
+            score -= 3
+        elif kw in desc_tags:
             score -= 1
 
     if score > 0:

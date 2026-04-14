@@ -1,7 +1,9 @@
 """SKILL.md generation stage.
 
-Converts an extracted_logic.json artifact into an installable Claude skill
-following the Agent Skills specification: YAML frontmatter + four-section body.
+Converts an extracted_logic.json artifact into an installable Claude Code skill
+following the official skills specification: YAML frontmatter + instructional body.
+
+See: https://code.claude.com/docs/en/skills
 """
 
 from __future__ import annotations
@@ -22,7 +24,7 @@ from yt_to_skill.stages.base import StageResult, artifact_guard
 # ---------------------------------------------------------------------------
 
 _MAX_NAME = 64
-_MAX_DESCRIPTION = 1024
+_MAX_DESCRIPTION = 1536
 
 
 def _render_entry_condition(cond: EntryCondition) -> str:
@@ -168,10 +170,9 @@ def render_skill_md(
 ) -> str:
     """Render a TradingLogicExtraction to a SKILL.md string.
 
-    Produces:
-    - YAML frontmatter with name, description, metadata block
-    - Four-section body per strategy (Strategy Overview, Entry/Exit Criteria,
-      Risk Management, Market Regime Filters)
+    Produces a Claude Code-compatible skill file with:
+    - YAML frontmatter with name, description (official spec fields)
+    - Instructional body that teaches Claude how to apply the trading strategy
     - REQUIRES_SPECIFICATION inline callouts within relevant sections
     - Optional ## Chart References gallery when keyframe_paths provided
 
@@ -181,31 +182,40 @@ def render_skill_md(
             a gallery section is appended. Backward compatible: callers that
             pass no argument get the same output as before.
     """
-    # ── Frontmatter ────────────────────────────────────────────────────────
+    # ── Frontmatter (Claude Code skills spec) ─────────────────────────────
     name = extraction.video_id.lower()[:_MAX_NAME]
 
     strategy_names = [s.strategy_name for s in extraction.strategies]
     if strategy_names:
-        description = "Trading strategies extracted from video: " + ", ".join(strategy_names)
+        description = (
+            "Trading strategy skill: " + ", ".join(strategy_names)
+            + ". Use when analyzing trades or applying this strategy to market data."
+        )
     else:
         description = f"Trading logic extracted from video {extraction.video_id}."
     description = description[:_MAX_DESCRIPTION]
 
-    metadata = {
-        "version": "1.0",
-        "source_url": f"https://www.youtube.com/watch?v={extraction.video_id}",
-        "source_language": extraction.source_language,
-    }
+    source_url = f"https://www.youtube.com/watch?v={extraction.video_id}"
 
     frontmatter_dict = {
         "name": name,
         "description": description,
-        "metadata": metadata,
+        "user-invocable": True,
+        "allowed-tools": "Read Bash(echo *)",
     }
 
     # Use yaml.dump but strip trailing newline, then wrap with ---
     fm_yaml = yaml.dump(frontmatter_dict, default_flow_style=False, allow_unicode=True).rstrip()
     frontmatter_block = f"---\n{fm_yaml}\n---\n\n"
+
+    # ── Instructional preamble ─────────────────────────────────────────────
+    preamble_lines: list[str] = [
+        "You are a trading strategy assistant. When the user invokes this skill,",
+        "apply the following strategy rules to analyze market conditions or evaluate",
+        "potential trades. Always cite specific entry/exit criteria and risk rules.\n",
+        f"**Source:** [{source_url}]({source_url})",
+        f"**Source language:** {extraction.source_language}\n",
+    ]
 
     # ── Body ───────────────────────────────────────────────────────────────
     body_lines: list[str] = []
@@ -225,7 +235,7 @@ def render_skill_md(
     if keyframe_paths:
         gallery = render_gallery_section(keyframe_paths)
 
-    return frontmatter_block + body + gallery
+    return frontmatter_block + "\n".join(preamble_lines) + "\n\n" + body + gallery
 
 
 def run_skill(
