@@ -59,7 +59,11 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. After running the pipeline on a video with chart content, `skills/<video_id>/assets/` contains deduplicated keyframe PNGs at scene-transition boundaries
   2. The pipeline does not produce keyframe explosions on screen-recording trading videos (frame count stays within configurable cap)
-**Plans**: TBD
+**Plans:** 2 plans
+
+Plans:
+- [ ] 03-01-PLAN.md — Keyframe extraction stage: dependencies, config, video download, scene detection, dedup
+- [ ] 03-02-PLAN.md — Pipeline integration: SKILL.md gallery, orchestrator wiring, CLI flags, threshold calibration
 
 ## Progress
 
@@ -70,4 +74,4 @@ Phases execute in numeric order: 1 → 2 → 3
 |-------|----------------|--------|-----------|
 | 1. Text Pipeline | 4/5 | In Progress|  |
 | 2. Output and CLI | 2/2 | Complete   | 2026-04-14 |
-| 3. Visual Enrichment | 0/TBD | Not started | - |
+| 3. Visual Enrichment | 0/2 | Not started | - |
