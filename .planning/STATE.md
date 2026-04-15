@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 04-01-PLAN.md
-last_updated: "2026-04-15T10:36:41.580Z"
+stopped_at: "Checkpoint: 04-02 Task 2 human-verify"
+last_updated: "2026-04-15T10:41:53.867Z"
 last_activity: 2026-04-14 — Completed plan 02-01 (errors + skill stage)
 progress:
   total_phases: 4
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 11
-  completed_plans: 10
+  completed_plans: 11
   percent: 40
 ---
 
@@ -60,6 +60,7 @@ Progress: [████░░░░░░] 40%
 | Phase 03-visual-enrichment P01 | 5min | 2 tasks | 6 files |
 | Phase 03-visual-enrichment P02 | 8min | 1 tasks | 6 files |
 | Phase 04-auto-install-generated-skills-to-claude-code-and-compatible-skill-systems P01 | 2min | 2 tasks | 5 files |
+| Phase 04-auto-install-generated-skills-to-claude-code-and-compatible-skill-systems P02 | 4min | 1 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -101,6 +102,8 @@ Recent decisions affecting current work:
 - [Phase 04-auto-install-generated-skills-to-claude-code-and-compatible-skill-systems]: Two-phase provenance: staging SKILL.md gets source_video_id; installer adds installed_at on copy
 - [Phase 04-auto-install-generated-skills-to-claude-code-and-compatible-skill-systems]: uninstall_skill only removes directories with source_video_id in frontmatter to protect manually created skills
 - [Phase 04-auto-install-generated-skills-to-claude-code-and-compatible-skill-systems]: copilot uses .github/skills/ for project-local path (not .copilot/skills/) per GitHub Copilot conventions
+- [Phase 04-auto-install-generated-skills-to-claude-code-and-compatible-skill-systems]: Backward compat shim inserts 'process' into sys.argv when first arg is URL-like — existing tests work without modification
+- [Phase 04-auto-install-generated-skills-to-claude-code-and-compatible-skill-systems]: Batch runs collect all skill entries then call _run_install_flow once — single install prompt for all videos
 
 ### Roadmap Evolution
 
@@ -118,6 +121,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-15T10:36:41.578Z
-Stopped at: Completed 04-01-PLAN.md
+Last session: 2026-04-15T10:41:45.687Z
+Stopped at: Checkpoint: 04-02 Task 2 human-verify
 Resume file: None
