@@ -200,6 +200,7 @@ def render_skill_md(
     frontmatter_dict = {
         "name": name,
         "description": description,
+        "source_video_id": extraction.video_id,
         "user-invocable": True,
         "allowed-tools": "Read Bash(echo *)",
     }
