@@ -77,7 +77,7 @@ Plans:
   4. User can run `yt-to-skill uninstall <name>` to remove a skill from all agents
   5. Bare `yt-to-skill <url>` (no subcommand) still works for backward compatibility
   6. Batch runs show one install prompt at the end for all generated skills
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 
 Plans:
 - [ ] 04-01-PLAN.md — Installer module: agent detection, path map, install/copy, provenance, conflict, list, uninstall
@@ -93,4 +93,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | 1. Text Pipeline | 4/5 | In Progress|  |
 | 2. Output and CLI | 2/2 | Complete   | 2026-04-14 |
 | 3. Visual Enrichment | 0/2 | Not started | - |
-| 4. Skill Installation | 0/2 | Not started | - |
+| 4. Skill Installation | 1/2 | In Progress|  |

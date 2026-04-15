@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase 4 context gathered
-last_updated: "2026-04-15T09:58:18.304Z"
+stopped_at: Completed 04-01-PLAN.md
+last_updated: "2026-04-15T10:36:41.580Z"
 last_activity: 2026-04-14 — Completed plan 02-01 (errors + skill stage)
 progress:
   total_phases: 4
   completed_phases: 3
-  total_plans: 9
-  completed_plans: 9
+  total_plans: 11
+  completed_plans: 10
   percent: 40
 ---
 
@@ -59,6 +59,7 @@ Progress: [████░░░░░░] 40%
 | Phase 02-output-and-cli P02 | 8min | 2 tasks | 8 files |
 | Phase 03-visual-enrichment P01 | 5min | 2 tasks | 6 files |
 | Phase 03-visual-enrichment P02 | 8min | 1 tasks | 6 files |
+| Phase 04-auto-install-generated-skills-to-claude-code-and-compatible-skill-systems P01 | 2min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -96,6 +97,10 @@ Recent decisions affecting current work:
 - [Phase 03-visual-enrichment]: render_gallery_section returns empty string for empty list — backward-compatible optional gallery in render_skill_md
 - [Phase 03-visual-enrichment]: Keyframe stage errors do not abort pipeline — keyframes are nice-to-have, logged and appended as error StageResult
 - [Phase 03-visual-enrichment]: SKILL.md re-rendered with gallery after keyframes extracted — run_skill called twice (Stage 6 initial, Stage 7 with keyframe_paths)
+- [Phase 04-auto-install-generated-skills-to-claude-code-and-compatible-skill-systems]: get_global_paths() and get_project_paths() are functions (not module-level constants) so Path.home() evaluates at call time, enabling test monkeypatching
+- [Phase 04-auto-install-generated-skills-to-claude-code-and-compatible-skill-systems]: Two-phase provenance: staging SKILL.md gets source_video_id; installer adds installed_at on copy
+- [Phase 04-auto-install-generated-skills-to-claude-code-and-compatible-skill-systems]: uninstall_skill only removes directories with source_video_id in frontmatter to protect manually created skills
+- [Phase 04-auto-install-generated-skills-to-claude-code-and-compatible-skill-systems]: copilot uses .github/skills/ for project-local path (not .copilot/skills/) per GitHub Copilot conventions
 
 ### Roadmap Evolution
 
@@ -113,6 +118,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-15T09:58:18.301Z
-Stopped at: Phase 4 context gathered
-Resume file: .planning/phases/04-auto-install-generated-skills-to-claude-code-and-compatible-skill-systems/04-CONTEXT.md
+Last session: 2026-04-15T10:36:41.578Z
+Stopped at: Completed 04-01-PLAN.md
+Resume file: None

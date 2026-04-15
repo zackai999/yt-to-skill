@@ -38,11 +38,11 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Skill Installation
 
-- [ ] **INST-01**: Pipeline detects installed Agent Skills-compatible tools (Claude Code, Codex CLI, Cursor, Gemini CLI, Copilot) on the machine
-- [ ] **INST-02**: Pipeline installs generated skill directory tree (SKILL.md + assets/ + scripts/ + references/) to selected agent skill directories
-- [ ] **INST-03**: Installed SKILL.md includes provenance fields (source_video_id, installed_at) in frontmatter
-- [ ] **INST-04**: User can list all yt-to-skill-generated skills across all agents via `yt-to-skill list`
-- [ ] **INST-05**: User can uninstall a skill from all agents via `yt-to-skill uninstall <name>`
+- [x] **INST-01**: Pipeline detects installed Agent Skills-compatible tools (Claude Code, Codex CLI, Cursor, Gemini CLI, Copilot) on the machine
+- [x] **INST-02**: Pipeline installs generated skill directory tree (SKILL.md + assets/ + scripts/ + references/) to selected agent skill directories
+- [x] **INST-03**: Installed SKILL.md includes provenance fields (source_video_id, installed_at) in frontmatter
+- [x] **INST-04**: User can list all yt-to-skill-generated skills across all agents via `yt-to-skill list`
+- [x] **INST-05**: User can uninstall a skill from all agents via `yt-to-skill uninstall <name>`
 - [ ] **CLI-01**: CLI uses subcommand pattern (process, list, uninstall) with backward compatibility for bare `yt-to-skill <url>`
 - [ ] **CLI-02**: Interactive agent selection prompt shown after skill generation; skippable via `--install` flag
 - [ ] **CLI-03**: Batch runs (playlist/channel) collect all generated skills and show one install prompt at the end
