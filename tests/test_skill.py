@@ -125,6 +125,26 @@ class TestRenderSkillMdFrontmatter:
         fm = yaml.safe_load(parts[1])
         assert "MomentumBreakout" in fm["description"]
 
+    def test_render_skill_md_includes_source_video_id(self):
+        """Rendered SKILL.md frontmatter contains source_video_id field matching extraction.video_id."""
+        extraction = make_extraction(video_id="testvid42")
+        output = render_skill_md(extraction)
+        parts = output.split("---\n", 2)
+        assert len(parts) >= 3, "Expected frontmatter delimited by ---"
+        fm = yaml.safe_load(parts[1])
+        assert "source_video_id" in fm
+        assert fm["source_video_id"] == "testvid42"
+
+    def test_source_video_id_in_frontmatter_yaml(self):
+        """YAML-parsed frontmatter dict has source_video_id key."""
+        extraction = make_extraction(video_id="abc_xyz_999")
+        output = render_skill_md(extraction)
+        parts = output.split("---\n", 2)
+        fm = yaml.safe_load(parts[1])
+        assert isinstance(fm, dict)
+        assert "source_video_id" in fm
+        assert fm["source_video_id"] == "abc_xyz_999"
+
 
 # ---------------------------------------------------------------------------
 # Body structure tests
