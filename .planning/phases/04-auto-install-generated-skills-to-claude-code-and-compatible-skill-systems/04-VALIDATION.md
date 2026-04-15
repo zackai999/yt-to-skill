@@ -38,26 +38,19 @@ created: 2026-04-15
 
 | Task ID | Plan | Wave | Requirement | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|-----------|-------------------|-------------|--------|
-| 04-01-01 | 01 | 0 | Wave 0 setup | unit | `uv run pytest tests/test_installer.py -x -q` | ❌ W0 | ⬜ pending |
-| 04-02-01 | 02 | 1 | Agent detection | unit | `uv run pytest tests/test_installer.py::test_detect_installed_agents -x` | ❌ W0 | ⬜ pending |
-| 04-02-02 | 02 | 1 | Install copies full tree | unit | `uv run pytest tests/test_installer.py::test_install_skill_dir_copies_tree -x` | ❌ W0 | ⬜ pending |
-| 04-02-03 | 02 | 1 | Provenance injection | unit | `uv run pytest tests/test_installer.py::test_provenance_injected -x` | ❌ W0 | ⬜ pending |
-| 04-02-04 | 02 | 1 | Conflict prompts overwrite | unit | `uv run pytest tests/test_installer.py::test_conflict_prompts_overwrite -x` | ❌ W0 | ⬜ pending |
-| 04-03-01 | 03 | 1 | list filters by provenance | unit | `uv run pytest tests/test_installer.py::test_list_filters_by_provenance -x` | ❌ W0 | ⬜ pending |
-| 04-03-02 | 03 | 1 | uninstall removes from all agents | unit | `uv run pytest tests/test_installer.py::test_uninstall_removes_from_all_agents -x` | ❌ W0 | ⬜ pending |
-| 04-04-01 | 04 | 1 | process subcommand | unit | `uv run pytest tests/test_cli.py::test_process_subcommand -x` | ❌ W0 | ⬜ pending |
-| 04-04-02 | 04 | 1 | bare URL backward compat | unit | `uv run pytest tests/test_cli.py::test_bare_url_backward_compat -x` | ❌ W0 | ⬜ pending |
-| 04-04-03 | 04 | 1 | --install flag skips prompt | unit | `uv run pytest tests/test_cli.py::test_install_flag_skips_prompt -x` | ❌ W0 | ⬜ pending |
-| 04-02-05 | 02 | 1 | Name sanitization | unit | `uv run pytest tests/test_installer.py::test_name_sanitization -x` | ❌ W0 | ⬜ pending |
+| 04-01-T1 | 01 | 1 | INST-01..05 — Installer module (agent detection, install, provenance, sanitize, conflict, list, uninstall) | unit | `uv run pytest tests/test_installer.py -x -q` | tests/test_installer.py (new) | pending |
+| 04-01-T2 | 01 | 1 | INST-01 — source_video_id in staging frontmatter | unit | `uv run pytest tests/test_skill.py -x -q` | tests/test_skill.py (exists) | pending |
+| 04-02-T1 | 02 | 2 | CLI-01..03 — Subcommand CLI, install flow, conflict custom name | unit | `uv run pytest tests/test_cli.py -x -q` | tests/test_cli.py (exists) | pending |
+| 04-02-T2 | 02 | 2 | CLI-01..03 — End-to-end human verification | manual | `uv run pytest tests/ -q` (automated gate) + manual flow | n/a | pending |
 
-*Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
+*Status: pending -- green -- red -- flaky*
 
 ---
 
 ## Wave 0 Requirements
 
 - [ ] `tests/test_installer.py` — all installer unit tests (new file needed)
-- [ ] `tests/test_cli.py` — new subcommand tests (file exists, needs new test functions)
+- [ ] `tests/test_cli.py` — new subcommand + conflict custom name tests (file exists, needs new test functions)
 
 *Existing test infrastructure covers framework setup; only new test files/functions needed.*
 
@@ -68,6 +61,7 @@ created: 2026-04-15
 | Behavior | Requirement | Why Manual | Test Instructions |
 |----------|-------------|------------|-------------------|
 | Interactive agent selection prompt | Agent selection UX | Requires TTY interaction | Run `yt-to-skill process <url>`, verify interactive prompt appears with detected agents |
+| Conflict custom name prompt | Name conflict UX | Requires TTY interaction | Re-process same video, decline overwrite, verify custom name prompt appears |
 | Batch install prompt for playlists | Batch UX | Requires TTY + real playlist | Run `yt-to-skill process <playlist_url>`, verify single install prompt at end |
 
 ---
