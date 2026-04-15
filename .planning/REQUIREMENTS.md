@@ -36,6 +36,17 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **INFR-01**: All LLM calls route through OpenRouter as unified gateway
 - [x] **INFR-02**: Pipeline uses intermediate artifacts on disk (work/<video_id>/) for resumability and debugging
 
+### Skill Installation
+
+- [ ] **INST-01**: Pipeline detects installed Agent Skills-compatible tools (Claude Code, Codex CLI, Cursor, Gemini CLI, Copilot) on the machine
+- [ ] **INST-02**: Pipeline installs generated skill directory tree (SKILL.md + assets/ + scripts/ + references/) to selected agent skill directories
+- [ ] **INST-03**: Installed SKILL.md includes provenance fields (source_video_id, installed_at) in frontmatter
+- [ ] **INST-04**: User can list all yt-to-skill-generated skills across all agents via `yt-to-skill list`
+- [ ] **INST-05**: User can uninstall a skill from all agents via `yt-to-skill uninstall <name>`
+- [ ] **CLI-01**: CLI uses subcommand pattern (process, list, uninstall) with backward compatibility for bare `yt-to-skill <url>`
+- [ ] **CLI-02**: Interactive agent selection prompt shown after skill generation; skippable via `--install` flag
+- [ ] **CLI-03**: Batch runs (playlist/channel) collect all generated skills and show one install prompt at the end
+
 ## v2 Requirements
 
 Deferred to future release. Tracked but not in current roadmap.
@@ -86,12 +97,20 @@ Which phases cover which requirements. Updated during roadmap creation.
 | OUTP-06 | Phase 2 | Complete |
 | INFR-01 | Phase 1 | Complete |
 | INFR-02 | Phase 1 | Complete |
+| INST-01 | Phase 4 | Planned |
+| INST-02 | Phase 4 | Planned |
+| INST-03 | Phase 4 | Planned |
+| INST-04 | Phase 4 | Planned |
+| INST-05 | Phase 4 | Planned |
+| CLI-01 | Phase 4 | Planned |
+| CLI-02 | Phase 4 | Planned |
+| CLI-03 | Phase 4 | Planned |
 
 **Coverage:**
-- v1 requirements: 17 total
-- Mapped to phases: 17
+- v1 requirements: 25 total
+- Mapped to phases: 25
 - Unmapped: 0
 
 ---
 *Requirements defined: 2026-04-14*
-*Last updated: 2026-04-14 after roadmap creation*
+*Last updated: 2026-04-15 after Phase 4 planning*
