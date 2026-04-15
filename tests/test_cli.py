@@ -1,7 +1,7 @@
 """Tests for CLI entry point, config extension, and orchestrator wiring."""
 
 from pathlib import Path
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, call, patch
 
 import pytest
 
@@ -150,7 +150,8 @@ def test_cli_single_video(monkeypatch, capsys):
     monkeypatch.setattr("sys.argv", ["yt-to-skill", "https://www.youtube.com/watch?v=vid1xxx"])
 
     with patch("yt_to_skill.cli.resolve_urls", return_value=["vid1xxx"]) as mock_resolve, \
-         patch("yt_to_skill.cli.run_pipeline", return_value=_make_success_results("vid1xxx")):
+         patch("yt_to_skill.cli.run_pipeline", return_value=_make_success_results("vid1xxx")), \
+         patch("yt_to_skill.cli._run_install_flow"):
 
         with pytest.raises(SystemExit) as exc_info:
             main()
@@ -177,7 +178,8 @@ def test_cli_output_dir_flag(monkeypatch, tmp_path):
         return _make_success_results(video_id)
 
     with patch("yt_to_skill.cli.resolve_urls", return_value=["vid1xxx"]), \
-         patch("yt_to_skill.cli.run_pipeline", side_effect=mock_run_pipeline):
+         patch("yt_to_skill.cli.run_pipeline", side_effect=mock_run_pipeline), \
+         patch("yt_to_skill.cli._run_install_flow"):
 
         with pytest.raises(SystemExit) as exc_info:
             main()
@@ -203,7 +205,8 @@ def test_cli_force_flag(monkeypatch):
         return _make_success_results(video_id)
 
     with patch("yt_to_skill.cli.resolve_urls", return_value=["vid1xxx"]), \
-         patch("yt_to_skill.cli.run_pipeline", side_effect=mock_run_pipeline):
+         patch("yt_to_skill.cli.run_pipeline", side_effect=mock_run_pipeline), \
+         patch("yt_to_skill.cli._run_install_flow"):
 
         with pytest.raises(SystemExit) as exc_info:
             main()
@@ -223,7 +226,8 @@ def test_cli_verbose_flag(monkeypatch, capsys):
     ])
 
     with patch("yt_to_skill.cli.resolve_urls", return_value=["vid1xxx"]), \
-         patch("yt_to_skill.cli.run_pipeline", return_value=_make_success_results("vid1xxx")):
+         patch("yt_to_skill.cli.run_pipeline", return_value=_make_success_results("vid1xxx")), \
+         patch("yt_to_skill.cli._run_install_flow"):
 
         with pytest.raises(SystemExit) as exc_info:
             main()
@@ -249,7 +253,8 @@ def test_batch_continues_on_failure(monkeypatch, capsys):
         return _make_success_results(video_id)
 
     with patch("yt_to_skill.cli.resolve_urls", return_value=["vid1", "vid2"]), \
-         patch("yt_to_skill.cli.run_pipeline", side_effect=mock_run_pipeline):
+         patch("yt_to_skill.cli.run_pipeline", side_effect=mock_run_pipeline), \
+         patch("yt_to_skill.cli._run_install_flow"):
 
         with pytest.raises(SystemExit) as exc_info:
             main()
@@ -270,7 +275,8 @@ def test_exit_code_all_success(monkeypatch):
     ])
 
     with patch("yt_to_skill.cli.resolve_urls", return_value=["vid1xxx"]), \
-         patch("yt_to_skill.cli.run_pipeline", return_value=_make_success_results("vid1xxx")):
+         patch("yt_to_skill.cli.run_pipeline", return_value=_make_success_results("vid1xxx")), \
+         patch("yt_to_skill.cli._run_install_flow"):
 
         with pytest.raises(SystemExit) as exc_info:
             main()
@@ -293,7 +299,8 @@ def test_exit_code_partial_failure(monkeypatch):
         return _make_success_results(video_id)
 
     with patch("yt_to_skill.cli.resolve_urls", return_value=["vid1", "vid2"]), \
-         patch("yt_to_skill.cli.run_pipeline", side_effect=mock_run_pipeline):
+         patch("yt_to_skill.cli.run_pipeline", side_effect=mock_run_pipeline), \
+         patch("yt_to_skill.cli._run_install_flow"):
 
         with pytest.raises(SystemExit) as exc_info:
             main()
@@ -316,7 +323,8 @@ def test_batch_summary_table(monkeypatch, capsys):
         return _make_success_results(video_id)
 
     with patch("yt_to_skill.cli.resolve_urls", return_value=["vid1", "vid2"]), \
-         patch("yt_to_skill.cli.run_pipeline", side_effect=mock_run_pipeline):
+         patch("yt_to_skill.cli.run_pipeline", side_effect=mock_run_pipeline), \
+         patch("yt_to_skill.cli._run_install_flow"):
 
         with pytest.raises(SystemExit):
             main()
@@ -339,7 +347,8 @@ def test_non_strategy_video_in_batch(monkeypatch, capsys):
     ])
 
     with patch("yt_to_skill.cli.resolve_urls", return_value=["vid1", "vid2"]), \
-         patch("yt_to_skill.cli.run_pipeline") as mock_run:
+         patch("yt_to_skill.cli.run_pipeline") as mock_run, \
+         patch("yt_to_skill.cli._run_install_flow"):
 
         # vid1: strategy video (full results including skill)
         # vid2: non-strategy video (pipeline stopped at filter stage — no skill stage)
@@ -396,7 +405,8 @@ class TestNoKeyframesFlag:
         ])
 
         with patch("yt_to_skill.cli.resolve_urls", return_value=["vid1xxx"]), \
-             patch("yt_to_skill.cli.run_pipeline", return_value=_make_success_results("vid1xxx")):
+             patch("yt_to_skill.cli.run_pipeline", return_value=_make_success_results("vid1xxx")), \
+             patch("yt_to_skill.cli._run_install_flow"):
             with pytest.raises(SystemExit) as exc_info:
                 main()
 
@@ -419,7 +429,8 @@ class TestNoKeyframesFlag:
             return _make_success_results(video_id)
 
         with patch("yt_to_skill.cli.resolve_urls", return_value=["vid1xxx"]), \
-             patch("yt_to_skill.cli.run_pipeline", side_effect=mock_run_pipeline):
+             patch("yt_to_skill.cli.run_pipeline", side_effect=mock_run_pipeline), \
+             patch("yt_to_skill.cli._run_install_flow"):
             with pytest.raises(SystemExit):
                 main()
 
@@ -438,7 +449,8 @@ class TestMaxKeyframesFlag:
         ])
 
         with patch("yt_to_skill.cli.resolve_urls", return_value=["vid1xxx"]), \
-             patch("yt_to_skill.cli.run_pipeline", return_value=_make_success_results("vid1xxx")):
+             patch("yt_to_skill.cli.run_pipeline", return_value=_make_success_results("vid1xxx")), \
+             patch("yt_to_skill.cli._run_install_flow"):
             with pytest.raises(SystemExit) as exc_info:
                 main()
 
@@ -461,8 +473,427 @@ class TestMaxKeyframesFlag:
             return _make_success_results(video_id)
 
         with patch("yt_to_skill.cli.resolve_urls", return_value=["vid1xxx"]), \
-             patch("yt_to_skill.cli.run_pipeline", side_effect=mock_run_pipeline):
+             patch("yt_to_skill.cli.run_pipeline", side_effect=mock_run_pipeline), \
+             patch("yt_to_skill.cli._run_install_flow"):
             with pytest.raises(SystemExit):
                 main()
 
         assert captured_config[0].max_keyframes == 7
+
+
+# ---------------------------------------------------------------------------
+# New subcommand tests (Plan 04-02)
+# ---------------------------------------------------------------------------
+
+
+def test_process_subcommand(monkeypatch, capsys):
+    """yt-to-skill process <url> routes to pipeline and exits 0."""
+    from yt_to_skill.cli import main
+
+    monkeypatch.setenv("OPENROUTER_API_KEY", "test-key")
+    monkeypatch.setattr("sys.argv", ["yt-to-skill", "process", "https://www.youtube.com/watch?v=vid1"])
+
+    with patch("yt_to_skill.cli.resolve_urls", return_value=["vid1"]), \
+         patch("yt_to_skill.cli.run_pipeline", return_value=_make_success_results("vid1")), \
+         patch("yt_to_skill.cli._run_install_flow"):
+
+        with pytest.raises(SystemExit) as exc_info:
+            main()
+
+    assert exc_info.value.code == 0
+
+
+def test_bare_url_backward_compat(monkeypatch, capsys):
+    """yt-to-skill <url> (no subcommand) behaves same as yt-to-skill process <url>."""
+    from yt_to_skill.cli import main
+
+    monkeypatch.setenv("OPENROUTER_API_KEY", "test-key")
+    monkeypatch.setattr("sys.argv", ["yt-to-skill", "https://www.youtube.com/watch?v=vid1"])
+
+    with patch("yt_to_skill.cli.resolve_urls", return_value=["vid1"]) as mock_resolve, \
+         patch("yt_to_skill.cli.run_pipeline", return_value=_make_success_results("vid1")), \
+         patch("yt_to_skill.cli._run_install_flow"):
+
+        with pytest.raises(SystemExit) as exc_info:
+            main()
+
+    assert exc_info.value.code == 0
+    mock_resolve.assert_called_once_with("https://www.youtube.com/watch?v=vid1")
+
+
+def test_list_subcommand(monkeypatch, capsys):
+    """yt-to-skill list calls list_installed_skills and prints results."""
+    from yt_to_skill.cli import main
+
+    monkeypatch.setenv("OPENROUTER_API_KEY", "test-key")
+    monkeypatch.setattr("sys.argv", ["yt-to-skill", "list"])
+
+    mock_skills = [
+        {
+            "agent": "claude-code",
+            "name": "btc-macd",
+            "source_video_id": "abc123",
+            "installed_at": "2026-04-15T10:00:00Z",
+            "path": Path("/home/user/.claude/skills/btc-macd"),
+            "scope": "global",
+        }
+    ]
+
+    with patch("yt_to_skill.cli.list_installed_skills", return_value=mock_skills):
+        with pytest.raises(SystemExit) as exc_info:
+            main()
+
+    assert exc_info.value.code == 0
+    out = capsys.readouterr().out
+    assert "btc-macd" in out
+    assert "claude-code" in out
+
+
+def test_list_subcommand_empty(monkeypatch, capsys):
+    """yt-to-skill list with no skills prints a message."""
+    from yt_to_skill.cli import main
+
+    monkeypatch.setenv("OPENROUTER_API_KEY", "test-key")
+    monkeypatch.setattr("sys.argv", ["yt-to-skill", "list"])
+
+    with patch("yt_to_skill.cli.list_installed_skills", return_value=[]):
+        with pytest.raises(SystemExit) as exc_info:
+            main()
+
+    assert exc_info.value.code == 0
+    out = capsys.readouterr().out
+    assert "No yt-to-skill" in out or "no skills" in out.lower()
+
+
+def test_uninstall_subcommand(monkeypatch, capsys):
+    """yt-to-skill uninstall <name> calls uninstall_skill and reports results."""
+    from yt_to_skill.cli import main
+
+    monkeypatch.setenv("OPENROUTER_API_KEY", "test-key")
+    monkeypatch.setattr("sys.argv", ["yt-to-skill", "uninstall", "btc-macd"])
+
+    removed_paths = [Path("/home/user/.claude/skills/btc-macd")]
+
+    with patch("yt_to_skill.cli.uninstall_skill", return_value=removed_paths) as mock_uninstall:
+        with pytest.raises(SystemExit) as exc_info:
+            main()
+
+    assert exc_info.value.code == 0
+    mock_uninstall.assert_called_once_with("btc-macd")
+    out = capsys.readouterr().out
+    assert "btc-macd" in out
+
+
+def test_uninstall_not_found(monkeypatch, capsys):
+    """yt-to-skill uninstall <missing> prints 'not found' message."""
+    from yt_to_skill.cli import main
+
+    monkeypatch.setenv("OPENROUTER_API_KEY", "test-key")
+    monkeypatch.setattr("sys.argv", ["yt-to-skill", "uninstall", "missing-skill"])
+
+    with patch("yt_to_skill.cli.uninstall_skill", return_value=[]):
+        with pytest.raises(SystemExit) as exc_info:
+            main()
+
+    assert exc_info.value.code == 0
+    out = capsys.readouterr().out
+    assert "not found" in out.lower() or "missing-skill" in out
+
+
+def test_install_flag_skips_prompt(monkeypatch):
+    """--install claude-code,codex bypasses interactive prompt, installs to specified agents."""
+    from yt_to_skill.cli import main
+
+    monkeypatch.setenv("OPENROUTER_API_KEY", "test-key")
+    monkeypatch.setattr("sys.argv", [
+        "yt-to-skill", "process", "https://www.youtube.com/watch?v=vid1",
+        "--install", "claude-code,codex",
+    ])
+
+    with patch("yt_to_skill.cli.resolve_urls", return_value=["vid1"]), \
+         patch("yt_to_skill.cli.run_pipeline", return_value=_make_success_results("vid1")), \
+         patch("yt_to_skill.cli._run_install_flow") as mock_flow:
+
+        with pytest.raises(SystemExit) as exc_info:
+            main()
+
+    assert exc_info.value.code == 0
+    # _run_install_flow must be called (install flag is passed via args)
+    mock_flow.assert_called_once()
+    call_args = mock_flow.call_args
+    # args.install should be set
+    args_passed = call_args[0][1]  # second positional arg is args
+    assert args_passed.install == "claude-code,codex"
+
+
+def test_install_flag_unknown_agent(monkeypatch, capsys):
+    """--install bogus-agent prints error about unknown agent."""
+    from yt_to_skill.cli import _run_install_flow
+    from yt_to_skill.config import PipelineConfig
+
+    monkeypatch.setenv("OPENROUTER_API_KEY", "test-key")
+
+    # Create a mock args object with install flag set to an unknown agent
+    args = MagicMock()
+    args.install = "bogus-agent"
+
+    skill_entries = [(Path("skills/vid1"), "vid1")]
+
+    with patch("yt_to_skill.cli.detect_installed_agents", return_value=["claude-code", "codex"]), \
+         patch("yt_to_skill.cli.install_skill"):
+        _run_install_flow(skill_entries, args)
+
+    out = capsys.readouterr().out
+    assert "bogus-agent" in out or "unknown" in out.lower() or "not found" in out.lower()
+
+
+def test_existing_flags_under_process(monkeypatch):
+    """yt-to-skill process <url> --force --verbose --no-keyframes --max-keyframes 5 all parse correctly."""
+    from yt_to_skill.cli import main
+
+    monkeypatch.setenv("OPENROUTER_API_KEY", "test-key")
+    monkeypatch.setattr("sys.argv", [
+        "yt-to-skill", "process", "https://www.youtube.com/watch?v=vid1",
+        "--force", "--verbose", "--no-keyframes", "--max-keyframes", "5",
+    ])
+
+    captured = {}
+
+    def mock_run_pipeline(video_id, config, *, force=False):
+        captured["force"] = force
+        captured["keyframes_enabled"] = config.keyframes_enabled
+        captured["max_keyframes"] = config.max_keyframes
+        return _make_success_results(video_id)
+
+    with patch("yt_to_skill.cli.resolve_urls", return_value=["vid1"]), \
+         patch("yt_to_skill.cli.run_pipeline", side_effect=mock_run_pipeline), \
+         patch("yt_to_skill.cli._run_install_flow"):
+
+        with pytest.raises(SystemExit) as exc_info:
+            main()
+
+    assert exc_info.value.code == 0
+    assert captured["force"] is True
+    assert captured["keyframes_enabled"] is False
+    assert captured["max_keyframes"] == 5
+
+
+def test_no_args_shows_help(monkeypatch, capsys):
+    """yt-to-skill with no args prints help and exits 0."""
+    from yt_to_skill.cli import main
+
+    monkeypatch.setenv("OPENROUTER_API_KEY", "test-key")
+    monkeypatch.setattr("sys.argv", ["yt-to-skill"])
+
+    with pytest.raises(SystemExit) as exc_info:
+        main()
+
+    assert exc_info.value.code == 0
+    out = capsys.readouterr().out
+    assert "usage" in out.lower() or "yt-to-skill" in out
+
+
+def test_batch_collects_skills_for_single_prompt(monkeypatch):
+    """Playlist URL processes all videos, then shows ONE install prompt for all generated skills."""
+    from yt_to_skill.cli import main
+
+    monkeypatch.setenv("OPENROUTER_API_KEY", "test-key")
+    monkeypatch.setattr("sys.argv", [
+        "yt-to-skill", "process", "https://www.youtube.com/playlist?list=PLx",
+    ])
+
+    with patch("yt_to_skill.cli.resolve_urls", return_value=["vid1", "vid2"]), \
+         patch("yt_to_skill.cli.run_pipeline") as mock_run, \
+         patch("yt_to_skill.cli._run_install_flow") as mock_flow:
+
+        mock_run.side_effect = [
+            _make_success_results("vid1"),
+            _make_success_results("vid2"),
+        ]
+
+        with pytest.raises(SystemExit):
+            main()
+
+    # install flow called exactly once (not per-video)
+    assert mock_flow.call_count == 1
+    # All skill entries passed in one call
+    install_call_args = mock_flow.call_args[0]
+    skill_entries = install_call_args[0]
+    assert len(skill_entries) == 2
+
+
+def test_non_tty_skips_interactive_prompt(monkeypatch, capsys):
+    """When sys.stdin.isatty() is False, install prompt is skipped with info message."""
+    from yt_to_skill.cli import _run_install_flow
+
+    monkeypatch.setenv("OPENROUTER_API_KEY", "test-key")
+
+    args = MagicMock()
+    args.install = None  # no --install flag
+
+    skill_entries = [(Path("skills/vid1"), "vid1")]
+
+    with patch("sys.stdin") as mock_stdin:
+        mock_stdin.isatty.return_value = False
+        _run_install_flow(skill_entries, args)
+
+    out = capsys.readouterr().out
+    assert "non-interactive" in out.lower() or "skipping" in out.lower()
+
+
+def test_skill_summary_shown_before_install(monkeypatch, capsys, tmp_path):
+    """After processing, skill summary (name, strategy count) is printed before install prompt."""
+    from yt_to_skill.cli import _run_install_flow
+
+    monkeypatch.setenv("OPENROUTER_API_KEY", "test-key")
+
+    # Create a mock skill dir with a SKILL.md
+    skill_dir = tmp_path / "my-strategy"
+    skill_dir.mkdir()
+    skill_md = skill_dir / "SKILL.md"
+    skill_md.write_text(
+        "---\nname: My Strategy\nsource_video_id: abc123\n---\n# My Strategy\n",
+        encoding="utf-8",
+    )
+
+    args = MagicMock()
+    args.install = None
+
+    skill_entries = [(skill_dir, "abc123")]
+
+    with patch("sys.stdin") as mock_stdin:
+        mock_stdin.isatty.return_value = False  # skip interactive part
+        _run_install_flow(skill_entries, args)
+
+    out = capsys.readouterr().out
+    assert "My Strategy" in out or "my-strategy" in out
+
+
+def test_install_conflict_prompts_overwrite(monkeypatch, tmp_path):
+    """When skill exists at target, questionary.confirm('Overwrite?') is called."""
+    from yt_to_skill.cli import _run_install_flow
+
+    monkeypatch.setenv("OPENROUTER_API_KEY", "test-key")
+
+    skill_dir = tmp_path / "my-strategy"
+    skill_dir.mkdir()
+    (skill_dir / "SKILL.md").write_text(
+        "---\nname: My Strategy\nsource_video_id: abc123\n---\n# My Strategy\n",
+        encoding="utf-8",
+    )
+
+    args = MagicMock()
+    args.install = None
+
+    target_base = tmp_path / "claude-skills"
+    target_base.mkdir()
+
+    skill_entries = [(skill_dir, "abc123")]
+
+    with patch("sys.stdin") as mock_stdin, \
+         patch("yt_to_skill.cli.detect_installed_agents", return_value=["claude-code"]), \
+         patch("yt_to_skill.cli.get_global_paths", return_value={"claude-code": target_base}), \
+         patch("yt_to_skill.cli.get_project_paths", return_value={"claude-code": tmp_path / "proj"}), \
+         patch("yt_to_skill.cli._check_conflict", return_value=True), \
+         patch("yt_to_skill.cli.install_skill") as mock_install, \
+         patch("yt_to_skill.cli.questionary") as mock_q:
+
+        mock_stdin.isatty.return_value = True
+
+        # Setup questionary chain
+        mock_q.checkbox.return_value.ask.return_value = ["claude-code"]
+        mock_q.select.return_value.ask.return_value = "global"
+        mock_q.confirm.return_value.ask.return_value = True  # overwrite confirmed
+
+        _run_install_flow(skill_entries, args)
+
+    mock_q.confirm.assert_called_once()
+    confirm_call_str = str(mock_q.confirm.call_args)
+    assert "verwrite" in confirm_call_str or "exist" in confirm_call_str.lower()
+
+
+def test_install_conflict_offers_custom_name(monkeypatch, tmp_path):
+    """When skill exists and user declines overwrite, questionary.text() prompts for custom name."""
+    from yt_to_skill.cli import _run_install_flow
+
+    monkeypatch.setenv("OPENROUTER_API_KEY", "test-key")
+
+    skill_dir = tmp_path / "my-strategy"
+    skill_dir.mkdir()
+    (skill_dir / "SKILL.md").write_text(
+        "---\nname: My Strategy\nsource_video_id: abc123\n---\n# My Strategy\n",
+        encoding="utf-8",
+    )
+
+    args = MagicMock()
+    args.install = None
+
+    target_base = tmp_path / "claude-skills"
+    target_base.mkdir()
+
+    skill_entries = [(skill_dir, "abc123")]
+
+    with patch("sys.stdin") as mock_stdin, \
+         patch("yt_to_skill.cli.detect_installed_agents", return_value=["claude-code"]), \
+         patch("yt_to_skill.cli.get_global_paths", return_value={"claude-code": target_base}), \
+         patch("yt_to_skill.cli.get_project_paths", return_value={"claude-code": tmp_path / "proj"}), \
+         patch("yt_to_skill.cli._check_conflict", return_value=True), \
+         patch("yt_to_skill.cli.install_skill") as mock_install, \
+         patch("yt_to_skill.cli.sanitize_skill_name", return_value="my-custom-name") as mock_sanitize, \
+         patch("yt_to_skill.cli.questionary") as mock_q:
+
+        mock_stdin.isatty.return_value = True
+        mock_q.checkbox.return_value.ask.return_value = ["claude-code"]
+        mock_q.select.return_value.ask.return_value = "global"
+        mock_q.confirm.return_value.ask.return_value = False  # decline overwrite
+        mock_q.text.return_value.ask.return_value = "my-custom-name"
+
+        _run_install_flow(skill_entries, args)
+
+    mock_q.text.assert_called_once()
+    mock_sanitize.assert_called()
+    mock_install.assert_called_once()
+    install_kwargs = mock_install.call_args[1]
+    assert install_kwargs.get("skill_name") == "my-custom-name" or \
+           mock_install.call_args[0][2] == "my-custom-name"
+
+
+def test_install_conflict_custom_name_cancel(monkeypatch, tmp_path):
+    """When skill exists, user declines overwrite, and cancels custom name prompt — skill skipped."""
+    from yt_to_skill.cli import _run_install_flow
+
+    monkeypatch.setenv("OPENROUTER_API_KEY", "test-key")
+
+    skill_dir = tmp_path / "my-strategy"
+    skill_dir.mkdir()
+    (skill_dir / "SKILL.md").write_text(
+        "---\nname: My Strategy\nsource_video_id: abc123\n---\n# My Strategy\n",
+        encoding="utf-8",
+    )
+
+    args = MagicMock()
+    args.install = None
+
+    target_base = tmp_path / "claude-skills"
+    target_base.mkdir()
+
+    skill_entries = [(skill_dir, "abc123")]
+
+    with patch("sys.stdin") as mock_stdin, \
+         patch("yt_to_skill.cli.detect_installed_agents", return_value=["claude-code"]), \
+         patch("yt_to_skill.cli.get_global_paths", return_value={"claude-code": target_base}), \
+         patch("yt_to_skill.cli.get_project_paths", return_value={"claude-code": tmp_path / "proj"}), \
+         patch("yt_to_skill.cli._check_conflict", return_value=True), \
+         patch("yt_to_skill.cli.install_skill") as mock_install, \
+         patch("yt_to_skill.cli.questionary") as mock_q:
+
+        mock_stdin.isatty.return_value = True
+        mock_q.checkbox.return_value.ask.return_value = ["claude-code"]
+        mock_q.select.return_value.ask.return_value = "global"
+        mock_q.confirm.return_value.ask.return_value = False  # decline overwrite
+        mock_q.text.return_value.ask.return_value = None  # cancel custom name
+
+        _run_install_flow(skill_entries, args)
+
+    # install_skill must NOT be called
+    mock_install.assert_not_called()
