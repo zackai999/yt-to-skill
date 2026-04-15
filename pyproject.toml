@@ -17,6 +17,7 @@ dependencies = [
     "scenedetect[opencv-headless]>=0.6.7",
     "imagehash>=4.3.2",
     "questionary>=2.1.1",
+    "mlx-whisper>=0.4.3",
 ]
 
 [project.scripts]

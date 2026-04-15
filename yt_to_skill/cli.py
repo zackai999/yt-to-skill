@@ -19,16 +19,24 @@ Examples:
 from __future__ import annotations
 
 import argparse
+import os
 import sys
 from pathlib import Path
 
-import questionary
-import yaml
-from loguru import logger
+# Suppress duplicate ObjC class warnings from cv2/av dylib conflict on macOS.
+# Must run before any import that transitively loads cv2 or av.
+if sys.platform == "darwin":
+    _devnull_fd = os.open(os.devnull, os.O_WRONLY)
+    _orig_stderr_fd = os.dup(2)
+    os.dup2(_devnull_fd, 2)
 
-from yt_to_skill.config import PipelineConfig
-from yt_to_skill.errors import NetworkError, SkillError
-from yt_to_skill.installer import (
+import questionary  # noqa: E402
+import yaml  # noqa: E402
+from loguru import logger  # noqa: E402
+
+from yt_to_skill.config import PipelineConfig  # noqa: E402
+from yt_to_skill.errors import NetworkError, SkillError  # noqa: E402
+from yt_to_skill.installer import (  # noqa: E402
     _check_conflict,
     detect_installed_agents,
     get_global_paths,
@@ -38,8 +46,14 @@ from yt_to_skill.installer import (
     sanitize_skill_name,
     uninstall_skill,
 )
-from yt_to_skill.orchestrator import run_pipeline
-from yt_to_skill.resolver import resolve_urls
+from yt_to_skill.orchestrator import run_pipeline  # noqa: E402
+from yt_to_skill.resolver import resolve_urls  # noqa: E402
+
+# Restore stderr after all imports
+if sys.platform == "darwin":
+    os.dup2(_orig_stderr_fd, 2)
+    os.close(_orig_stderr_fd)
+    os.close(_devnull_fd)
 
 
 # ---------------------------------------------------------------------------
@@ -224,8 +238,8 @@ def _run_install_flow(skill_entries: list[tuple[Path, str]], args: argparse.Name
         return
 
     selected = questionary.checkbox(
-        "Select agents to install into:",
-        choices=agents,
+        "Select agents to install into (space=toggle, enter=confirm):",
+        choices=[questionary.Choice(a, checked=(a == "claude-code")) for a in agents],
     ).ask()
     if not selected:
         return
@@ -328,6 +342,10 @@ def _cmd_process(args: argparse.Namespace) -> None:
         print(f"[ERROR] Failed to load configuration: {exc}")
         print("Hint: ensure OPENROUTER_API_KEY is set in your environment or .env file.")
         sys.exit(1)
+
+    # Export HF_TOKEN to os.environ so huggingface_hub picks it up for downloads
+    if config.hf_token:
+        os.environ.setdefault("HF_TOKEN", config.hf_token)
 
     if args.output_dir is not None:
         config = config.model_copy(update={"skills_dir": Path(args.output_dir)})
@@ -532,6 +550,16 @@ def main() -> None:
     elif args.subcommand == "uninstall":
         _cmd_uninstall(args)
     else:
-        # No subcommand, no URL — show help
+        # No subcommand, no URL — show help and prompt for a URL interactively
         parser.print_help()
-        sys.exit(0)
+        print()
+        if sys.stdin.isatty():
+            url = questionary.text("Enter a YouTube URL to process:").ask()
+            if url and url.strip():
+                sys.argv = [sys.argv[0], "process", url.strip()]
+                args = parser.parse_args()
+                _cmd_process(args)
+            else:
+                sys.exit(0)
+        else:
+            sys.exit(0)

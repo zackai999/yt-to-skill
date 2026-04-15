@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
+import platform
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from loguru import logger
 from youtube_transcript_api import YouTubeTranscriptApi
@@ -25,19 +26,24 @@ if TYPE_CHECKING:
 # Constants
 # ---------------------------------------------------------------------------
 
-BELLE_WHISPER_MODEL_ID = "Huan69/Belle-whisper-large-v3-zh-punct-fasterwhisper"
+# mlx-whisper needs MLX-converted models from mlx-community
+MLX_WHISPER_MODEL_ID = "mlx-community/whisper-large-v3-mlx"
+# faster-whisper uses CTranslate2 format models
+FASTER_WHISPER_MODEL_ID = "Huan69/Belle-whisper-large-v3-zh-punct-fasterwhisper"
+
+_IS_APPLE_SILICON = platform.system() == "Darwin" and platform.machine() == "arm64"
 
 _DEFAULT_LANGUAGE_PRIORITY = ["zh", "zh-Hans", "zh-Hant", "en"]
 
 # ---------------------------------------------------------------------------
-# Whisper model singleton
+# Whisper model singleton (faster-whisper only; mlx-whisper is stateless)
 # ---------------------------------------------------------------------------
 
 _whisper_model: "WhisperModel | None" = None
 
 
 def get_whisper_model(device: str = "cpu", compute_type: str = "int8") -> "WhisperModel":
-    """Lazy-load the Belle Whisper model (singleton).
+    """Lazy-load the faster-whisper model (singleton). Used on non-Apple-Silicon systems.
 
     Args:
         device: Inference device ("cpu" or "cuda")
@@ -52,11 +58,11 @@ def get_whisper_model(device: str = "cpu", compute_type: str = "int8") -> "Whisp
 
         logger.info(
             "Loading Whisper model {model_id} on {device}",
-            model_id=BELLE_WHISPER_MODEL_ID,
+            model_id=FASTER_WHISPER_MODEL_ID,
             device=device,
         )
         _whisper_model = WhisperModel(
-            BELLE_WHISPER_MODEL_ID,
+            FASTER_WHISPER_MODEL_ID,
             device=device,
             compute_type=compute_type,
         )
@@ -198,21 +204,37 @@ def is_caption_quality_acceptable(
 # ---------------------------------------------------------------------------
 
 
-def transcribe_audio(
+def _transcribe_mlx(audio_path: Path) -> list[dict]:
+    """Transcribe using mlx-whisper on Apple Silicon (Metal GPU)."""
+    import mlx_whisper
+
+    logger.info(
+        "Transcribing with mlx-whisper ({model}) on Metal GPU",
+        model=MLX_WHISPER_MODEL_ID,
+    )
+    result = mlx_whisper.transcribe(
+        str(audio_path),
+        path_or_hf_repo=MLX_WHISPER_MODEL_ID,
+        language="zh",
+        task="transcribe",
+    )
+
+    return [
+        {
+            "start": seg["start"],
+            "end": seg["end"],
+            "text": seg["text"].strip(),
+        }
+        for seg in result.get("segments", [])
+    ]
+
+
+def _transcribe_faster_whisper(
     audio_path: Path,
     device: str = "cpu",
     compute_type: str = "int8",
 ) -> list[dict]:
-    """Transcribe audio file using the Belle Whisper model.
-
-    Args:
-        audio_path: Path to the audio file
-        device: Inference device ("cpu" or "cuda")
-        compute_type: Quantization type
-
-    Returns:
-        List of {start, end, text} segment dicts
-    """
+    """Transcribe using faster-whisper on CPU/CUDA."""
     model = get_whisper_model(device=device, compute_type=compute_type)
 
     segments_iter, _info = model.transcribe(
@@ -231,6 +253,29 @@ def transcribe_audio(
         }
         for seg in segments_iter
     ]
+
+
+def transcribe_audio(
+    audio_path: Path,
+    device: str = "cpu",
+    compute_type: str = "int8",
+) -> list[dict]:
+    """Transcribe audio file using the best available backend.
+
+    On Apple Silicon: uses mlx-whisper (Metal GPU acceleration).
+    On other systems: uses faster-whisper (CPU/CUDA).
+
+    Args:
+        audio_path: Path to the audio file
+        device: Inference device for faster-whisper ("cpu" or "cuda")
+        compute_type: Quantization type for faster-whisper
+
+    Returns:
+        List of {start, end, text} segment dicts
+    """
+    if _IS_APPLE_SILICON:
+        return _transcribe_mlx(audio_path)
+    return _transcribe_faster_whisper(audio_path, device=device, compute_type=compute_type)
 
 
 # ---------------------------------------------------------------------------

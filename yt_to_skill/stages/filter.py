@@ -26,8 +26,13 @@ STRATEGY_KEYWORDS: frozenset[str] = frozenset({
     # English
     "strategy", "trading", "entry", "exit", "setup", "indicator",
     "rsi", "macd", "support", "resistance", "breakout", "pullback",
-    # Chinese (must be lowercase-safe — CJK chars are not affected by .lower())
-    "策略", "入场", "出场", "止损", "止盈", "指标", "趋势", "突破", "回调", "均线", "布林",
+    # Chinese — general trading terms
+    "策略", "入场", "出场", "进场", "离场", "止损", "止盈", "指标", "趋势", "突破", "回调", "均线", "布林",
+    # Chinese — technical analysis & market context
+    "行情分析", "技术分析", "支撑", "阻力", "价格走势",
+    # Chinese — crypto trading jargon
+    "暴跌", "暴拉", "高位", "低位", "追多", "追空", "做多", "做空", "多单", "空单",
+    "合约", "杠杆", "仓位", "爆仓", "抄底", "逃顶",
 })
 
 NON_STRATEGY_KEYWORDS: frozenset[str] = frozenset({
@@ -189,6 +194,18 @@ def run_filter(
         transcript_sample=transcript_text,
         config=config,
     )
+
+    # Low-confidence NOT_STRATEGY override: if Stage 1 passed (metadata has
+    # strategy keywords) but the LLM is unsure (confidence < 0.5), lean toward
+    # STRATEGY. The LLM may struggle with non-English transcripts.
+    if not is_strategy and confidence < 0.5:
+        logger.info(
+            "run_filter | video_id={} | low-confidence NOT_STRATEGY ({:.2f}) with metadata pass — overriding to STRATEGY",
+            video_id,
+            confidence,
+        )
+        is_strategy = True
+        confidence = 0.5
 
     reason = (
         "LLM classification: strategy content confirmed"

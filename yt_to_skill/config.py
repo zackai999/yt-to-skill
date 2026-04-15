@@ -17,6 +17,7 @@ class PipelineConfig(BaseSettings):
     translation_model: str = "anthropic/claude-sonnet-4.6"
     extraction_model: str = "anthropic/claude-sonnet-4.6"
     filter_model: str = "mistralai/mistral-small-2603"
+    hf_token: str | None = None
     whisper_device: str = "cpu"
     whisper_compute_type: str = "int8"
     max_tokens_translation: int = 4096
